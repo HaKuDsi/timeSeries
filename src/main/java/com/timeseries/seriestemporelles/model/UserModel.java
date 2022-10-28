@@ -3,7 +3,7 @@ package com.timeseries.seriestemporelles.model;
 import javax.persistence.*;
 
 @Entity
-@Table(name= "\"USER\"")
+@Table(name= "TBL_USER")
 public class UserModel {
 
     @Id
