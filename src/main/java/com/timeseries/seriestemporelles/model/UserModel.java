@@ -29,8 +29,8 @@ public class UserModel {
 
     public UserModel() {
     }
-/*
+    /*
     @OneToMany(mappedBy = "USER_SERIES")
     private Set<UserSeriesModel> userSeries = new HashSet<>();
- */
+    */
 }
