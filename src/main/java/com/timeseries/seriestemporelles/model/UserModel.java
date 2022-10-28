@@ -1,6 +1,8 @@
 package com.timeseries.seriestemporelles.model;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name= "TBL_USER")
@@ -8,7 +10,10 @@ public class UserModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "USER_ID")
     private Integer id;
+
+    @Column(name = "USER_NAME")
     private String name;
 
     public UserModel(String name) {
@@ -29,8 +34,7 @@ public class UserModel {
 
     public UserModel() {
     }
-    /*
-    @OneToMany(mappedBy = "USER_SERIES")
+
+    @OneToMany
     private Set<UserSeriesModel> userSeries = new HashSet<>();
-    */
 }

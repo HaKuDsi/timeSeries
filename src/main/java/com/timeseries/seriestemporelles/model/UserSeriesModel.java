@@ -8,8 +8,13 @@ public class UserSeriesModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "USER_SERIES_ID")
     private Integer id;
+
+    @Column(name = "USER_SERIES_PRIVILAGE")
     private UserPrivilege userPrivilage;
+
+    @Column(name = "USER_SERIES_OWNER")
     private Boolean owner;
 
     public UserSeriesModel() {
@@ -34,4 +39,9 @@ public class UserSeriesModel {
     public void setOwner(Boolean owner) {
         this.owner = owner;
     }
+
+    @ManyToOne
+    @JoinColumn(name = "USER_ID")
+    private UserModel userModel;
+
 }
