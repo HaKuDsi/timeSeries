@@ -1,7 +1,8 @@
 package com.timeseries.seriestemporelles.controller;
 
-import com.timeseries.seriestemporelles.model.UserPrivilege;
+import com.timeseries.seriestemporelles.model.SeriesModel;
 import com.timeseries.seriestemporelles.model.UserSeriesModel;
+import com.timeseries.seriestemporelles.service.SeriesService;
 import com.timeseries.seriestemporelles.service.UserSerieService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,9 @@ public class UserSerieController {
     @Autowired
     UserSerieService userSerieService;
 
+    @Autowired
+    SeriesService seriesService;
+
     @GetMapping("/userseries")
     private List getAllUserSeries() { return userSerieService.getAllUserSeries(); }
 
@@ -25,11 +29,15 @@ public class UserSerieController {
     @PostMapping("/userseries")
     private ResponseEntity createUserSerie(@RequestBody UserSeriesModel userSeries) {
         try {
+            SeriesModel serie = new SeriesModel();
+            seriesService.saveOrUpdate(serie);
+
+            userSeries.setSeries(serie);
             userSerieService.saveOrUpdate((userSeries));
         } catch (Exception exception) {
             return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity("New seriesreated with id: " + userSeries.getId(), HttpStatus.CREATED);
+        return new ResponseEntity("New series created with id: " + userSeries.getId(), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/userserie/{id}")
