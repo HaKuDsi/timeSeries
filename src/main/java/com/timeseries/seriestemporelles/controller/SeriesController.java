@@ -1,6 +1,7 @@
 package com.timeseries.seriestemporelles.controller;
 
 import com.timeseries.seriestemporelles.model.SeriesModel;
+import com.timeseries.seriestemporelles.model.UserSeriesModel;
 import com.timeseries.seriestemporelles.service.SeriesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,8 @@ public class SeriesController {
     private ResponseEntity createSerie(@RequestBody SeriesModel serie) {
         try {
             serie.setLastUpdatedDate();
+            //UserSeriesModel userSeriesModel = new UserSeriesModel();
+            //serie.setUserSeriesModel(userSeriesModel);
             seriesService.saveOrUpdate(serie);
         } catch (Exception exception) {
             return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -32,7 +35,7 @@ public class SeriesController {
         return new ResponseEntity("New serie created with id: " + serie.getId(), HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/series.{id}")
+    @DeleteMapping("/serie/{id}")
     private ResponseEntity deleteById(@PathVariable("id") int id) {
         try {
             seriesService.delete(id);

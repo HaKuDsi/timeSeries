@@ -1,6 +1,8 @@
 package com.timeseries.seriestemporelles.model;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name= "TBL_USER_SERIES")
@@ -12,7 +14,7 @@ public class UserSeriesModel {
     private Integer id;
 
     @Column(name = "USER_SERIES_PRIVILAGE")
-    private UserPrivilege userPrivilage;
+    private UserPrivilege userPrivilege;
 
     @Column(name = "USER_SERIES_OWNER")
     private Boolean owner;
@@ -24,12 +26,12 @@ public class UserSeriesModel {
         return id;
     }
 
-    public UserPrivilege getUserPrivilage() {
-        return userPrivilage;
+    public UserPrivilege getUserPrivilege() {
+        return userPrivilege;
     }
 
-    public void setUserPrivilage(UserPrivilege userPrivilage) {
-        this.userPrivilage = userPrivilage;
+    public void setUserPrivilege(String userPrivilege) {
+        this.userPrivilege = UserPrivilege.valueOf(userPrivilege);
     }
 
     public Boolean getOwner() {
@@ -43,5 +45,8 @@ public class UserSeriesModel {
     @ManyToOne
     @JoinColumn(name = "USER_ID")
     private UserModel userModel;
+
+    @OneToMany
+    private Set<SeriesModel> series = new HashSet<>();
 
 }

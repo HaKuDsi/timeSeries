@@ -49,4 +49,12 @@ public class SeriesModel {
 
     public SeriesModel() {
     }
+
+    @ManyToOne
+    @JoinColumn(name = "USER_SERIES_ID")
+    private UserSeriesModel userSeriesModel;
+
+    public UserSeriesModel getUserSeriesModel() {
+        return userSeriesModel;
+    }
 }
