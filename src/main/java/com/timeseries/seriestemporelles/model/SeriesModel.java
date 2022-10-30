@@ -1,9 +1,11 @@
 package com.timeseries.seriestemporelles.model;
 
 import javax.persistence.*;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 @Entity
 @Table(name = "TBL_SERIES")
@@ -14,7 +16,7 @@ public class SeriesModel {
     private Integer id;
     private String title;
     private String description;
-    private String lastUpdatedDate;
+    private ZonedDateTime lastUpdatedDate;
 
     public Integer getId() {
         return id;
@@ -29,7 +31,8 @@ public class SeriesModel {
     }
 
     public String getLastUpdatedDate() {
-        return lastUpdatedDate;
+        String date = DateTimeFormatter.ofPattern("yyyy-MMM-dd HH:mm z", Locale.FRANCE).format(this.lastUpdatedDate);
+        return date;
     }
 
     public void setTitle(String title) {
@@ -41,9 +44,7 @@ public class SeriesModel {
     }
 
     public void setLastUpdatedDate() {
-        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-        Date date = new Date();
-        this.lastUpdatedDate = dateFormat.format(date);
+        this.lastUpdatedDate = ZonedDateTime.now(ZoneId.of("UTC"));
     }
 
     public SeriesModel() {
