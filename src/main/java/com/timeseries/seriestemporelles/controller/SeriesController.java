@@ -24,6 +24,7 @@ public class SeriesController {
     @PostMapping("/series")
     private ResponseEntity createSerie(@RequestBody SeriesModel serie) {
         try {
+            serie.setLastUpdatedDate();
             seriesService.saveOrUpdate(serie);
         } catch (Exception exception) {
             return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);

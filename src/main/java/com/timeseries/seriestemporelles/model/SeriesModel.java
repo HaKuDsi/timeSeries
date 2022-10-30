@@ -2,8 +2,6 @@ package com.timeseries.seriestemporelles.model;
 
 import javax.persistence.*;
 
-import java.time.Clock;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -18,7 +16,7 @@ public class SeriesModel {
     private Integer id;
     private String title;
     private String description;
-    private String lastUpdatedDate;
+    private ZonedDateTime lastUpdatedDate;
 
     public Integer getId() {
         return id;
@@ -33,8 +31,8 @@ public class SeriesModel {
     }
 
     public String getLastUpdatedDate() {
-        //String date = DateTimeFormatter.ofPattern("yyyy-MMM-dd HH:mm z", Locale.FRANCE).format(this.lastUpdatedDate);
-        return this.lastUpdatedDate;
+        String date = DateTimeFormatter.ofPattern("yyyy-MMM-dd HH:mm z", Locale.FRANCE).format(this.lastUpdatedDate);
+        return date;
     }
 
     public void setTitle(String title) {
@@ -46,8 +44,7 @@ public class SeriesModel {
     }
 
     public void setLastUpdatedDate() {
-        Clock clock = Clock.systemUTC();
-        this.lastUpdatedDate = DateTimeFormatter.ofPattern("yyyy-MMM-dd HH:mm z", Locale.FRANCE).format(LocalDateTime.now());
+        this.lastUpdatedDate = ZonedDateTime.now(ZoneId.of("UTC"));
     }
 
     public SeriesModel() {
