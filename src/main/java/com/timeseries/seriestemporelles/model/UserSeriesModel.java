@@ -30,12 +30,6 @@ public class UserSeriesModel {
     public UserSeriesModel() {
     }
 
-    public UserSeriesModel(SeriesModel series) {
-        this.series = series;
-        this.userPrivilage = UserPrivilage.READ_PRIVILAGE;
-        this.owner = true;
-    }
-
     public Long getId() {
         return id;
     }
@@ -60,8 +54,8 @@ public class UserSeriesModel {
         return userPrivilage;
     }
 
-    public void setUserPrivilege(String userPrivilege) {
-        this.userPrivilage = UserPrivilage.valueOf(userPrivilege);
+    public void setUserPrivilege(UserPrivilage userPrivilege) {
+        this.userPrivilage = userPrivilege;
     }
 
     public Boolean getOwner() {

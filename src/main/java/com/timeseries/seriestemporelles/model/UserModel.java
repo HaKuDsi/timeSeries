@@ -16,9 +16,6 @@ public class UserModel {
     @Column(name = "USER_NAME")
     private String name;
 
-    @OneToMany
-    private Set<UserSeriesModel> userSeriesModels = new HashSet<>();
-
     public UserModel() {
     }
 
@@ -32,14 +29,6 @@ public class UserModel {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public Set<UserSeriesModel> getUserSeriesModels() {
-        return userSeriesModels;
-    }
-
-    public void setUserSeriesModels(Set<UserSeriesModel> userSeriesModels) {
-        this.userSeriesModels = userSeriesModels;
     }
 
     @Override

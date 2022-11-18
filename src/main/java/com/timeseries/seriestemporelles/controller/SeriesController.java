@@ -2,16 +2,18 @@ package com.timeseries.seriestemporelles.controller;
 
 import com.timeseries.seriestemporelles.model.SeriesModel;
 import com.timeseries.seriestemporelles.model.UserModel;
+import com.timeseries.seriestemporelles.model.UserPrivilage;
 import com.timeseries.seriestemporelles.model.UserSeriesModel;
 import com.timeseries.seriestemporelles.service.SeriesService;
 import com.timeseries.seriestemporelles.service.UserSerieService;
+import com.timeseries.seriestemporelles.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 @RestController
 public class SeriesController {
@@ -20,27 +22,29 @@ public class SeriesController {
     SeriesService seriesService;
     @Autowired
     UserSerieService userSerieService;
+    @Autowired
+    UserService userService;
 
     @GetMapping("/series")
     private List getAllSeries() { return seriesService.getAllSeries(); }
 
     @GetMapping("/serie/{id}")
-    private SeriesModel getSerieById(@PathVariable("id") int id) { return seriesService.getSerieById(id); }
+    private SeriesModel getSerieById(@PathVariable("id") Integer id) { return seriesService.getSerieById(id); }
 
-    @PostMapping("/series")
-    private ResponseEntity createSerie(@RequestBody SeriesModel series) {
+    @PostMapping("/serie/{id}")
+    private ResponseEntity createSerie(@PathVariable("id") Integer id, @RequestBody SeriesModel series) {
         try {
             series.setLastUpdatedDate();
-            //seriesService.saveOrUpdate(series);
-
-            UserSeriesModel newUserSeries = new UserSeriesModel();
-            userSerieService.saveOrUpdate(newUserSeries);
-
-            //newUserSeries.setSeries(series);
-            //userSerieService.saveOrUpdate(newUserSeries);
-
-            series.setUserSeries(newUserSeries);
             seriesService.saveOrUpdate(series);
+
+            UserModel user = userService.getUserById(id);
+
+            UserSeriesModel userSeries = new UserSeriesModel();
+            userSeries.setUsers(user);
+            userSeries.setSeries(series);
+            userSeries.setOwner(true);
+            userSeries.setUserPrivilege(UserPrivilage.WRITE_PRIVILAGE);
+            userSerieService.saveOrUpdate(userSeries);
 
         } catch (Exception exception) {
             return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);

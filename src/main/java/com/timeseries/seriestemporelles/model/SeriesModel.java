@@ -22,9 +22,6 @@ public class SeriesModel {
 
     private String description;
 
-    @OneToMany
-    private Set<UserSeriesModel> userSeries = new HashSet<>();
-
     private ZonedDateTime lastUpdatedDate;
 
     public SeriesModel() {
@@ -48,14 +45,6 @@ public class SeriesModel {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public Set<UserSeriesModel> getUserSeries() {
-        return userSeries;
-    }
-
-    public void setUserSeries(UserSeriesModel userSeriesModels) {
-        this.userSeries.add(userSeriesModels);
     }
 
     public String getLastUpdatedDate() {
