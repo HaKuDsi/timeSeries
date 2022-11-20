@@ -1,6 +1,7 @@
 package com.timeseries.seriestemporelles.model;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -15,7 +16,7 @@ public class EventModel {
     @Column(name = "EVENT_ID")
     private Integer id;
 
-    //private ZonedDateTime eventDate;
+    private ZonedDateTime eventDate;
 
     private Integer eventValue;
 
@@ -33,15 +34,18 @@ public class EventModel {
     public Integer getId() {
         return id;
     }
-/*
+
     public String getEventDate() {
         String date = DateTimeFormatter.ofPattern("yyyy-MMM-dd HH:mm z", Locale.FRANCE).format(this.eventDate);
         return date;    }
 
-    public void setEventDate(ZonedDateTime eventDate) {
-        this.eventDate = eventDate;
+    public void setEventDate(String eventDateString) {
+
+        ZoneId zone = ZoneId.of("UTC");
+        ZonedDateTime date = LocalDateTime.parse(eventDateString).atZone(zone);
+        this.eventDate = date;
     }
- */
+
     public Integer getEventValue() {
         return eventValue;
     }

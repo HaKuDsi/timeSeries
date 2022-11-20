@@ -9,6 +9,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -29,17 +33,20 @@ public class EventController {
     }
 
     @PostMapping("/event/{id}")
-    private ResponseEntity createEntity(@PathVariable("id") Integer id, @RequestBody EventModel event) {
+    private ResponseEntity createEntity(@PathVariable("id") Integer id, @RequestParam String eventDate) {
         try {
+            EventModel event = new EventModel();
             event.setLastUpdatedDate();
             SeriesModel serie = seriesService.getSerieById(id);
             event.setSerie(serie);
+
+            event.setEventDate(eventDate);
 
             eventService.saveOrUpdate(event);
         } catch (Exception exception) {
             return new ResponseEntity((HttpStatus.INTERNAL_SERVER_ERROR));
         }
-        return new ResponseEntity("New event created with id : " + event.getId(), HttpStatus.CREATED);
+        return new ResponseEntity("New event created with id : ", HttpStatus.CREATED);
     }
 
     @DeleteMapping("/event/{id}")
