@@ -34,22 +34,20 @@ public class EventController {
     }
 
     @PostMapping("/event/serie_id={id}")
-    private ResponseEntity createEntity(@PathVariable("id") Integer id, @RequestParam String eventDate) {
-        //int eventId = 0;
+    private ResponseEntity createEntity(@PathVariable("id") Integer id, @RequestBody EventModel event, @RequestParam String eventDate) {
         try {
-            EventModel event = new EventModel();
+            //EventModel event = new EventModel();
             event.setLastUpdatedDate();
             SeriesModel serie = seriesService.getSerieById(id);
             event.setSerie(serie);
 
             event.setEventDate(eventDate);
-            //eventId = event.getId();
             eventService.saveOrUpdate(event);
 
         } catch (Exception exception) {
             return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity("New event created with id : ", HttpStatus.CREATED);
+        return new ResponseEntity("New event created with id : " + event.getId(), HttpStatus.CREATED);
     }
 
     @PutMapping("/event/{id}")
