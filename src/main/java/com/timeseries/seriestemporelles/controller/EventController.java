@@ -9,10 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -32,8 +28,14 @@ public class EventController {
         return eventService.getEventById(id);
     }
 
+    @GetMapping("/events/{id}")
+    private List getEventsOfSerie(@PathVariable("id") Integer id) {
+        return eventService.getEventsOfSerie(id);
+    }
+
     @PostMapping("/event/{id}")
     private ResponseEntity createEntity(@PathVariable("id") Integer id, @RequestParam String eventDate) {
+        //int eventId = 0;
         try {
             EventModel event = new EventModel();
             event.setLastUpdatedDate();
@@ -41,8 +43,9 @@ public class EventController {
             event.setSerie(serie);
 
             event.setEventDate(eventDate);
-
+            //eventId = event.getId();
             eventService.saveOrUpdate(event);
+
         } catch (Exception exception) {
             return new ResponseEntity((HttpStatus.INTERNAL_SERVER_ERROR));
         }

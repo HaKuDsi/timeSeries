@@ -1,7 +1,9 @@
 package com.timeseries.seriestemporelles.service;
 
 import com.timeseries.seriestemporelles.model.EventModel;
+import com.timeseries.seriestemporelles.model.SeriesModel;
 import com.timeseries.seriestemporelles.repository.EventRepository;
+import com.timeseries.seriestemporelles.repository.SeriesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,10 +16,19 @@ public class EventService {
     @Autowired
     EventRepository eventRepository;
 
+    @Autowired
+    SeriesRepository seriesRepository;
+
     public List getAllEvents() {
         List events = new ArrayList();
         eventRepository.findAll().forEach(event -> events.add(event));
         return events;
+    }
+
+    public List getEventsOfSerie(int id) {
+        List events = new ArrayList();
+        SeriesModel serie = seriesRepository.findById(id).get();
+        return (List) eventRepository.findBySerie(serie);
     }
 
     public EventModel getEventById(int id) {
