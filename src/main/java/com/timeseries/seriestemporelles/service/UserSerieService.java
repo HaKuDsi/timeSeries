@@ -27,7 +27,7 @@ public class UserSerieService {
 
     public void saveOrUpdate(UserSeriesModel userSeries) { userSerieRepository.save(userSeries); }
 
-    public void delet(int id) { userSerieRepository.deleteById(id); }
+    public void delete(int id) { userSerieRepository.deleteById(id); }
 
     public Optional<UserSeriesModel> getUserSerieByUserSerie(UserModel user, SeriesModel serie) {
         return userSerieRepository.userSerieExist(user, serie);

@@ -27,23 +27,38 @@ public class UserController {
                 new ResourceNotFoundException("User: " + id + "is not found."));
     }
 
-    @PostMapping("/users")
-    private ResponseEntity createUser(@RequestBody UserModel user) {
+    @PostMapping("/user")
+    private ResponseEntity createUser(@RequestParam String userName) {
         try {
+            UserModel user = new UserModel(userName);
             userService.saveOrUpdate(user);
+            return new ResponseEntity("New user created with id: " + user.getId(), HttpStatus.CREATED);
         } catch (IllegalArgumentException exception) {
             return ResponseEntity.badRequest().build();
         }
-        return new ResponseEntity("New user created with id: " + user.getId(), HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/users/{id}")
+    @PutMapping("/user/{id}")
+    private ResponseEntity updateUser(@PathVariable("id") Integer id,
+                                      @RequestParam String userName) {
+        try {
+            UserModel user = userService.getUserById(id).orElseThrow(() ->
+                    new ResourceNotFoundException("User: " + id + " not found."));
+            user.setName(userName);
+            userService.saveOrUpdate(user);
+            return new ResponseEntity("New user created with id: " + user.getId(), HttpStatus.CREATED);
+        } catch (IllegalArgumentException exception) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @DeleteMapping("/user/{id}")
     private ResponseEntity deleteById(@PathVariable("id") int id) {
         try {
             userService.delete(id);
-        } catch (Exception exception) {
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity("User delete with id: " + id, HttpStatus.OK);
+        } catch (IllegalArgumentException exception) {
+            return ResponseEntity.badRequest().build();
         }
-        return new ResponseEntity("User delete with id: " + id, HttpStatus.OK);
     }
 }

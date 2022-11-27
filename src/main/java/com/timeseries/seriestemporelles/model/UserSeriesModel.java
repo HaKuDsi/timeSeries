@@ -1,7 +1,5 @@
 package com.timeseries.seriestemporelles.model;
 
-import org.springframework.web.bind.annotation.RequestBody;
-
 import javax.persistence.*;
 
 @Entity
@@ -11,7 +9,7 @@ public class UserSeriesModel {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "USER_SERIES_ID")
-    private Long id;
+    private Integer id;
 
     @ManyToOne
     @JoinColumn(name = "USER_ID")
@@ -30,7 +28,7 @@ public class UserSeriesModel {
     public UserSeriesModel() {
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
