@@ -8,13 +8,11 @@ import com.timeseries.seriestemporelles.model.UserSeriesModel;
 import com.timeseries.seriestemporelles.service.SeriesService;
 import com.timeseries.seriestemporelles.service.UserSerieService;
 import com.timeseries.seriestemporelles.service.UserService;
-import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -111,6 +109,7 @@ public class SeriesController {
 
             if(userSerie.getOwner()) {
                 seriesService.delete(id);
+                userSerieService.delete(userSerie.getId());
             } else {
                 return new ResponseEntity("User doesn't have permission", HttpStatus.BAD_REQUEST);
             }
