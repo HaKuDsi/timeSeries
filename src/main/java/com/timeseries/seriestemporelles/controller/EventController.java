@@ -106,6 +106,7 @@ public class EventController {
 
         UserSeriesModel userSerie = userSerieService.getUserSerieByUserSerie(user, serie).orElseThrow(() ->
                 new ResourceNotFoundException("UserSerie is not found."));
+
         if(userSerie.getUserPrivilege() == UserPrivilage.WRITE_PRIVILAGE) {
             event.setLastUpdatedDate();
             event.setEventDate(eventDate);
@@ -131,8 +132,12 @@ public class EventController {
 
             UserSeriesModel userSerie = userSerieService.getUserSerieByUserSerie(user, serie).orElseThrow(() ->
                     new ResourceNotFoundException("UserSerie is not found."));
-
-            eventService.delete(event);
+            
+            if(userSerie.getUserPrivilege() == UserPrivilage.WRITE_PRIVILAGE) {
+                eventService.delete(event);
+            } else {
+                return new ResponseEntity("User doesn't have permission", HttpStatus.BAD_REQUEST);
+            }
         } catch (IllegalArgumentException exception) {
             return ResponseEntity.badRequest().build();
         }
