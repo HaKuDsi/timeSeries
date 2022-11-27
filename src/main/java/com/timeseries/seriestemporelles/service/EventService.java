@@ -43,4 +43,8 @@ public class EventService {
     public void delete(EventModel event) {
         eventRepository.delete(event);
     }
+
+    public SeriesModel getSerieByEvent(Integer id) {
+        return eventRepository.findSerieByEvent(id);
+    }
 }

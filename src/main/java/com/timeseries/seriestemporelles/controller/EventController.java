@@ -31,15 +31,34 @@ public class EventController {
     @GetMapping("/events")
     private List getAllEvents() { return eventService.getAllEvents();}
 
-    @GetMapping("/event/{id}")
-    private EventModel getEventById(@PathVariable("id") Integer id) {
+    @GetMapping("/event/{id}/user_id={user_id}")
+    private EventModel getEventById(@PathVariable("id") Integer id,
+                                    @PathVariable("user_id") Integer userId) {
+        UserModel user = userService.getUserById(userId).orElseThrow(() ->
+                new ResourceNotFoundException("User: " + userId + " is not found."));
+
+        SeriesModel serie = eventService.getSerieByEvent(id);
+
+        UserSeriesModel userSerie = userSerieService.getUserSerieByUserSerie(user, serie).orElseThrow(() ->
+                new ResourceNotFoundException("UserSerie is not found."));
+
         return eventService.getEventById(id).orElseThrow(() ->
                 new ResourceNotFoundException("Event: " + id + " is not found."));
     }
 
-    @GetMapping("/events/{id}")
-    private List getEventsOfSerie(@PathVariable("id") Integer id) {
-        return eventService.getEventsOfSerie(id);
+    @GetMapping("/event/user_id={user_id}/serie_id={serie_id}")
+    private List getEventsOfSerie(@PathVariable("user_id") Integer userId,
+                                  @PathVariable("serie_id") Integer serieId) {
+        UserModel user = userService.getUserById(userId).orElseThrow(() ->
+                new ResourceNotFoundException("User: " + userId + " is not found."));
+
+        SeriesModel serie = seriesService.getSerieById(serieId).orElseThrow(() ->
+                new ResourceNotFoundException("Serie: " + serieId + " is not found."));
+
+        UserSeriesModel userSerie = userSerieService.getUserSerieByUserSerie(user, serie).orElseThrow(() ->
+                new ResourceNotFoundException("UserSerie is not found."));
+
+        return eventService.getEventsOfSerie(serieId);
     }
 
     @PostMapping("/event/user_id={user_id}/serie_id={serie_id}")
