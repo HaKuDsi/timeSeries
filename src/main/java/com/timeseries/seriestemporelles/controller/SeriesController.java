@@ -54,7 +54,7 @@ public class SeriesController {
             seriesService.saveOrUpdate(series);
 
             UserModel user = userService.getUserById(id).orElseThrow(() ->
-                    new ResourceNotFoundException("User: " + id + "is not found."));
+                    new ResourceNotFoundException("User: " + id + " is not found."));
 
             UserSeriesModel userSeries = new UserSeriesModel();
             userSeries.setUsers(user);
@@ -95,7 +95,7 @@ public class SeriesController {
     }
 
     @DeleteMapping("/serie/{id}/user_id={user_id}")
-    private ResponseEntity deleteById(@PathVariable("id") int id,
+    private ResponseEntity deleteById(@PathVariable("id") Integer id,
                                       @PathVariable("user_id") Integer userId) {
         try {
             UserModel user = userService.getUserById(userId).orElseThrow(() ->
