@@ -1,9 +1,7 @@
 package com.timeseries.seriestemporelles.controller;
 
 import com.timeseries.seriestemporelles.exception.ResourceNotFoundException;
-import com.timeseries.seriestemporelles.model.EventModel;
-import com.timeseries.seriestemporelles.model.SeriesModel;
-import com.timeseries.seriestemporelles.model.UserModel;
+import com.timeseries.seriestemporelles.model.*;
 import com.timeseries.seriestemporelles.service.EventService;
 import com.timeseries.seriestemporelles.service.SeriesService;
 import com.timeseries.seriestemporelles.service.UserSerieService;
@@ -56,15 +54,16 @@ public class EventController {
             SeriesModel serie = seriesService.getSerieById(serieId).orElseThrow(() ->
                     new ResourceNotFoundException("Serie: " + serieId + " is not found."));
 
-            if(userSerieService.exists(user, serie)) {
+            UserSeriesModel userSerie = userSerieService.getUserSerieByUserSerie(user, serie).orElseThrow(() ->
+                    new ResourceNotFoundException("UserSerie is not found."));
+
+            if(userSerie.getUserPrivilege() == UserPrivilage.WRITE_PRIVILAGE) {
                 event.setLastUpdatedDate();
                 event.setSerie(serie);
                 event.setEventDate(eventDate);
                 eventService.saveOrUpdate(event);
-
             } else {
-                return new ResponseEntity("user: " + user.getId() + " can't creat an event in the serie: "
-                        + serie.getId(), HttpStatus.BAD_REQUEST);
+                return new ResponseEntity("User doesn't have permission", HttpStatus.BAD_REQUEST);
             }
 
         } catch (IllegalArgumentException exception) {

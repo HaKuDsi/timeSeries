@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserSerieService {
@@ -28,9 +29,8 @@ public class UserSerieService {
 
     public void delet(int id) { userSerieRepository.deleteById(id); }
 
-    public Boolean exists(UserModel user, SeriesModel serie) {
-        UserSeriesModel userSeries = userSerieRepository.userSerieExist(user, serie);
-        return !(userSeries == null);
+    public Optional<UserSeriesModel> getUserSerieByUserSerie(UserModel user, SeriesModel serie) {
+        return userSerieRepository.userSerieExist(user, serie);
     }
 
 }

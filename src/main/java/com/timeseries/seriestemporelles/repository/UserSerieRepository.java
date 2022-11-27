@@ -7,10 +7,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface UserSerieRepository extends JpaRepository <UserSeriesModel, Integer> {
     @Query(value = "select u_s from UserSeriesModel u_s " +
             "where u_s.users = ?1 and " +
             "u_s.series = ?2")
-    UserSeriesModel userSerieExist(UserModel user, SeriesModel serie);
+    Optional<UserSeriesModel> userSerieExist(UserModel user, SeriesModel serie);
 }
