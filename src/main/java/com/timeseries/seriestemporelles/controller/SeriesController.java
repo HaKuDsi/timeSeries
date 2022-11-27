@@ -8,6 +8,7 @@ import com.timeseries.seriestemporelles.model.UserSeriesModel;
 import com.timeseries.seriestemporelles.service.SeriesService;
 import com.timeseries.seriestemporelles.service.UserSerieService;
 import com.timeseries.seriestemporelles.service.UserService;
+import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,14 +30,27 @@ public class SeriesController {
     @GetMapping("/series")
     private List getAllSeries() { return seriesService.getAllSeries(); }
 
-    @GetMapping("/serie/{id}")
-    private SeriesModel getSerieById(@PathVariable("id") Integer id) {
-        return seriesService.getSerieById(id).orElseThrow(() ->
-            new ResourceNotFoundException("Serie: " + id + " is not found."));
+    @GetMapping("/serie/{id}/user_id={user_id}")
+    private SeriesModel getSerieById(@PathVariable("id") Integer id,
+                                     @PathVariable("user_id") Integer userId) {
+        UserModel user = userService.getUserById(userId).orElseThrow(() ->
+                new ResourceNotFoundException("User: " + userId + "not found."));
+
+        SeriesModel serie = seriesService.getSerieById(id).orElseThrow(() ->
+                new ResourceNotFoundException("Serie: " + id + " is not found."));
+
+        UserSeriesModel userSerie = userSerieService.getUserSerieByUserSerie(user, serie).orElseThrow(() ->
+                new ResourceNotFoundException("UserSerie is not found."));
+
+        if(userSerie.getUserPrivilege() == UserPrivilage.WRITE_PRIVILAGE) {
+            return serie;
+        }
+        return null;
     }
 
     @PostMapping("/serie/{id}")
-    private ResponseEntity createSerie(@PathVariable("id") Integer id, @RequestBody SeriesModel series) {
+    private ResponseEntity createSerie(@PathVariable("id") Integer id,
+                                       @RequestBody SeriesModel series) {
         try {
             series.setLastUpdatedDate();
             seriesService.saveOrUpdate(series);
@@ -57,10 +71,49 @@ public class SeriesController {
         return new ResponseEntity("New series created with id: " + series.getId(), HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/serie/{id}")
-    private ResponseEntity deleteById(@PathVariable("id") int id) {
+    @PutMapping("/serie/{id}/user_id={user_id}")
+    private ResponseEntity updateSerie(@PathVariable("id") Integer id,
+                                       @PathVariable("user_id") Integer userId,
+                                       @RequestBody SeriesModel series) {
         try {
-            seriesService.delete(id);
+            UserModel user = userService.getUserById(userId).orElseThrow(() ->
+                    new ResourceNotFoundException("User: " + userId + "not found."));
+
+            SeriesModel serie = seriesService.getSerieById(id).orElseThrow(() ->
+                    new ResourceNotFoundException("Serie: " + id + " is not found."));
+
+            UserSeriesModel userSerie = userSerieService.getUserSerieByUserSerie(user, serie).orElseThrow(() ->
+                    new ResourceNotFoundException("UserSerie is not found."));
+
+            if(userSerie.getOwner()) {
+                seriesService.saveOrUpdate(series);
+            } else {
+                return new ResponseEntity("User doesn't have permission", HttpStatus.BAD_REQUEST);
+            }
+        } catch (IllegalArgumentException exception) {
+            return ResponseEntity.badRequest().build();
+        }
+        return new ResponseEntity("New series created with id: " + series.getId(), HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/serie/{id}/user_id={user_id}")
+    private ResponseEntity deleteById(@PathVariable("id") int id,
+                                      @PathVariable("user_id") Integer userId) {
+        try {
+            UserModel user = userService.getUserById(userId).orElseThrow(() ->
+                    new ResourceNotFoundException("User: " + userId + "not found."));
+
+            SeriesModel serie = seriesService.getSerieById(id).orElseThrow(() ->
+                    new ResourceNotFoundException("Serie: " + id + " is not found."));
+
+            UserSeriesModel userSerie = userSerieService.getUserSerieByUserSerie(user, serie).orElseThrow(() ->
+                    new ResourceNotFoundException("UserSerie is not found."));
+
+            if(userSerie.getOwner()) {
+                seriesService.delete(id);
+            } else {
+                return new ResponseEntity("User doesn't have permission", HttpStatus.BAD_REQUEST);
+            }
         } catch (Exception exception) {
             return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
         }

@@ -19,6 +19,10 @@ public class UserModel {
     public UserModel() {
     }
 
+    public UserModel(String name) {
+        this.name = name;
+    }
+
     public Integer getId() {
         return id;
     }
