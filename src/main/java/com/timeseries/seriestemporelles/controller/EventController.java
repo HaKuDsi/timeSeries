@@ -106,10 +106,13 @@ public class EventController {
 
         UserSeriesModel userSerie = userSerieService.getUserSerieByUserSerie(user, serie).orElseThrow(() ->
                 new ResourceNotFoundException("UserSerie is not found."));
-
-        event.setLastUpdatedDate();
-        event.setEventDate(eventDate);
-        eventService.saveOrUpdate(event);
+        if(userSerie.getUserPrivilege() == UserPrivilage.WRITE_PRIVILAGE) {
+            event.setLastUpdatedDate();
+            event.setEventDate(eventDate);
+            eventService.saveOrUpdate(event);
+        } else {
+            return new ResponseEntity("User doesn't have permission", HttpStatus.BAD_REQUEST);
+        }
 
         return new ResponseEntity("Event with id: " + id + " is modified", HttpStatus.OK);
     }
