@@ -1,5 +1,6 @@
 package com.timeseries.seriestemporelles.controller;
 
+import com.timeseries.seriestemporelles.exception.ResourceNotFoundException;
 import com.timeseries.seriestemporelles.model.UserModel;
 import com.timeseries.seriestemporelles.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,15 +23,16 @@ public class UserController {
 
     @GetMapping("/user/{id}")
     private UserModel getUserById(@PathVariable("id") int id) {
-        return userService.getUserById(id);
+        return userService.getUserById(id).orElseThrow(() ->
+                new ResourceNotFoundException("User: " + id + "is not found."));
     }
 
     @PostMapping("/users")
     private ResponseEntity createUser(@RequestBody UserModel user) {
         try {
             userService.saveOrUpdate(user);
-        } catch (Exception exception) {
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (IllegalArgumentException exception) {
+            return ResponseEntity.badRequest().build();
         }
         return new ResponseEntity("New user created with id: " + user.getId(), HttpStatus.CREATED);
     }
