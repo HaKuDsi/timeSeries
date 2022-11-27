@@ -1,9 +1,13 @@
 package com.timeseries.seriestemporelles.controller;
 
+import com.timeseries.seriestemporelles.exception.ResourceNotFoundException;
 import com.timeseries.seriestemporelles.model.EventModel;
 import com.timeseries.seriestemporelles.model.SeriesModel;
+import com.timeseries.seriestemporelles.model.UserModel;
 import com.timeseries.seriestemporelles.service.EventService;
 import com.timeseries.seriestemporelles.service.SeriesService;
+import com.timeseries.seriestemporelles.service.UserSerieService;
+import com.timeseries.seriestemporelles.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,12 +24,19 @@ public class EventController {
     @Autowired
     SeriesService seriesService;
 
+    @Autowired
+    UserService userService;
+
+    @Autowired
+    UserSerieService userSerieService;
+
     @GetMapping("/events")
     private List getAllEvents() { return eventService.getAllEvents();}
 
     @GetMapping("/event/{id}")
     private EventModel getEventById(@PathVariable("id") Integer id) {
-        return eventService.getEventById(id);
+        return eventService.getEventById(id).orElseThrow(() ->
+                new ResourceNotFoundException("Event: " + id + " is not found."));
     }
 
     @GetMapping("/events/{id}")
@@ -33,26 +44,40 @@ public class EventController {
         return eventService.getEventsOfSerie(id);
     }
 
-    @PostMapping("/event/serie_id={id}")
-    private ResponseEntity createEntity(@PathVariable("id") Integer id, @RequestBody EventModel event, @RequestParam String eventDate) {
+    @PostMapping("/event/user_id={user_id}/serie_id={serie_id}")
+    private ResponseEntity createEntity(@PathVariable("user_id") Integer userId,
+                                        @PathVariable("serie_id") Integer serieId ,
+                                        @RequestBody EventModel event,
+                                        @RequestParam String eventDate) {
         try {
-            //EventModel event = new EventModel();
-            event.setLastUpdatedDate();
-            SeriesModel serie = seriesService.getSerieById(id);
-            event.setSerie(serie);
+            UserModel user = userService.getUserById(userId).orElseThrow(() ->
+                    new ResourceNotFoundException("User: " + userId + " is not found."));
 
-            event.setEventDate(eventDate);
-            eventService.saveOrUpdate(event);
+            SeriesModel serie = seriesService.getSerieById(serieId).orElseThrow(() ->
+                    new ResourceNotFoundException("Serie: " + serieId + " is not found."));
 
-        } catch (Exception exception) {
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+            if(userSerieService.exists(user, serie)) {
+                event.setLastUpdatedDate();
+                event.setSerie(serie);
+                event.setEventDate(eventDate);
+                eventService.saveOrUpdate(event);
+
+            } else {
+                return new ResponseEntity("user: " + user.getId() + " can't creat an event in the serie: "
+                        + serie.getId(), HttpStatus.BAD_REQUEST);
+            }
+
+        } catch (IllegalArgumentException exception) {
+            return ResponseEntity.badRequest().build();
         }
         return new ResponseEntity("New event created with id : " + event.getId(), HttpStatus.CREATED);
     }
 
     @PutMapping("/event/{id}")
-    private ResponseEntity updateEntity(@PathVariable("id") Integer id, @RequestParam String eventDate) {
-        EventModel event = eventService.getEventById(id);
+    private ResponseEntity updateEntity(@PathVariable("id") Integer id,
+                                        @RequestParam String eventDate) {
+        EventModel event = eventService.getEventById(id).orElseThrow(() ->
+                new ResourceNotFoundException("Event: " + id + " is not found."));
         if(event != null) {
             event.setEventDate(eventDate);
             eventService.saveOrUpdate(event);
@@ -65,9 +90,11 @@ public class EventController {
     @DeleteMapping("/event/{id}")
     private ResponseEntity deleteById(@PathVariable("id") Integer id) {
         try {
-            eventService.delete(eventService.getEventById(id));
-        } catch (Exception exception) {
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+            EventModel event = eventService.getEventById(id).orElseThrow(() ->
+                    new ResourceNotFoundException("Event: " + id + " is not found."));
+            eventService.delete(event);
+        } catch (IllegalArgumentException exception) {
+            return ResponseEntity.badRequest().build();
         }
         return new ResponseEntity("Event delete with id: " + id, HttpStatus.OK);
     }

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class SeriesService {
@@ -20,7 +21,7 @@ public class SeriesService {
         return series;
     }
 
-    public SeriesModel getSerieById(int id) { return seriesRepository.findById(id).get(); }
+    public Optional<SeriesModel> getSerieById(int id) { return seriesRepository.findById(id); }
 
     public void saveOrUpdate(SeriesModel serie) { seriesRepository.save(serie); }
 

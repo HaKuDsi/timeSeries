@@ -1,5 +1,7 @@
 package com.timeseries.seriestemporelles.service;
 
+import com.timeseries.seriestemporelles.model.SeriesModel;
+import com.timeseries.seriestemporelles.model.UserModel;
 import com.timeseries.seriestemporelles.model.UserSeriesModel;
 import com.timeseries.seriestemporelles.repository.UserSerieRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,4 +27,10 @@ public class UserSerieService {
     public void saveOrUpdate(UserSeriesModel userSeries) { userSerieRepository.save(userSeries); }
 
     public void delet(int id) { userSerieRepository.deleteById(id); }
+
+    public Boolean exists(UserModel user, SeriesModel serie) {
+        UserSeriesModel userSeries = userSerieRepository.userSerieExist(user, serie);
+        return !(userSeries == null);
+    }
+
 }
