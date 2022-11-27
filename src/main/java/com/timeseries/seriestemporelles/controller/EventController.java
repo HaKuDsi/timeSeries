@@ -96,25 +96,28 @@ public class EventController {
                                         @PathVariable("user_id") Integer userId,
                                         @RequestParam String eventDate) {
 
-        EventModel event = eventService.getEventById(id).orElseThrow(() ->
-                new ResourceNotFoundException("Event: " + id + " is not found."));
+        try {
+            EventModel event = eventService.getEventById(id).orElseThrow(() ->
+                    new ResourceNotFoundException("Event: " + id + " is not found."));
 
-        UserModel user = userService.getUserById(userId).orElseThrow(() ->
-                new ResourceNotFoundException("User: " + userId + " is not found."));
+            UserModel user = userService.getUserById(userId).orElseThrow(() ->
+                    new ResourceNotFoundException("User: " + userId + " is not found."));
 
-        SeriesModel serie = eventService.getSerieByEvent(id);
+            SeriesModel serie = eventService.getSerieByEvent(id);
 
-        UserSeriesModel userSerie = userSerieService.getUserSerieByUserSerie(user, serie).orElseThrow(() ->
-                new ResourceNotFoundException("UserSerie is not found."));
+            UserSeriesModel userSerie = userSerieService.getUserSerieByUserSerie(user, serie).orElseThrow(() ->
+                    new ResourceNotFoundException("UserSerie is not found."));
 
-        if(userSerie.getUserPrivilege() == UserPrivilage.WRITE_PRIVILAGE) {
-            event.setLastUpdatedDate();
-            event.setEventDate(eventDate);
-            eventService.saveOrUpdate(event);
-        } else {
-            return new ResponseEntity("User doesn't have permission", HttpStatus.BAD_REQUEST);
+            if (userSerie.getUserPrivilege() == UserPrivilage.WRITE_PRIVILAGE) {
+                event.setLastUpdatedDate();
+                event.setEventDate(eventDate);
+                eventService.saveOrUpdate(event);
+            } else {
+                return new ResponseEntity("User doesn't have permission", HttpStatus.BAD_REQUEST);
+            }
+        } catch (IllegalArgumentException exception) {
+            return ResponseEntity.badRequest().build();
         }
-
         return new ResponseEntity("Event with id: " + id + " is modified", HttpStatus.OK);
     }
 

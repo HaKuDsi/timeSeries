@@ -41,7 +41,8 @@ public class SeriesController {
             series.setLastUpdatedDate();
             seriesService.saveOrUpdate(series);
 
-            UserModel user = userService.getUserById(id).orElseThrow(() ->new ResourceNotFoundException("User: " + id + "is not found."));
+            UserModel user = userService.getUserById(id).orElseThrow(() ->
+                    new ResourceNotFoundException("User: " + id + "is not found."));
 
             UserSeriesModel userSeries = new UserSeriesModel();
             userSeries.setUsers(user);
