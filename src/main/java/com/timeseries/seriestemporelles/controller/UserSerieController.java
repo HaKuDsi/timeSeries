@@ -22,31 +22,5 @@ public class UserSerieController {
 
     @GetMapping("/userseries")
     private List getAllUserSeries() { return userSerieService.getAllUserSeries(); }
-
-    @GetMapping("/userserie/{id}")
-    private UserSeriesModel getUserSerieById(@PathVariable("id") int id) { return userSerieService.getUserSerieById(id); }
-
-    @PostMapping("/userseries")
-    private ResponseEntity createUserSerie(@RequestBody UserSeriesModel userSeries) {
-        try {
-            SeriesModel serie = new SeriesModel();
-            seriesService.saveOrUpdate(serie);
-
-            userSeries.setSeries(serie);
-            userSerieService.saveOrUpdate((userSeries));
-        } catch (Exception exception) {
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        return new ResponseEntity("New series created with id: " + userSeries.getId(), HttpStatus.CREATED);
-    }
-
-    @DeleteMapping("/userserie/{id}")
-    private ResponseEntity deleteById(@PathVariable("id") int id) {
-        try {
-            userSerieService.delet(id);
-        } catch(Exception exception) {
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        return new ResponseEntity("Serie delete with id: " + id, HttpStatus.OK);
-    }
+    
 }
