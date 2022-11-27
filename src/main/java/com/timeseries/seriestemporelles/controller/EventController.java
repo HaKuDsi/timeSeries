@@ -91,25 +91,44 @@ public class EventController {
         return new ResponseEntity("New event created with id : " + event.getId(), HttpStatus.CREATED);
     }
 
-    @PutMapping("/event/{id}")
+    @PutMapping("/event/{id}/user_id={user_id}")
     private ResponseEntity updateEntity(@PathVariable("id") Integer id,
+                                        @PathVariable("user_id") Integer userId,
                                         @RequestParam String eventDate) {
+
         EventModel event = eventService.getEventById(id).orElseThrow(() ->
                 new ResourceNotFoundException("Event: " + id + " is not found."));
-        if(event != null) {
-            event.setEventDate(eventDate);
-            eventService.saveOrUpdate(event);
-            return new ResponseEntity("Event with id: " + id + " is modified", HttpStatus.OK);
-        } else {
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
-        }
+
+        UserModel user = userService.getUserById(userId).orElseThrow(() ->
+                new ResourceNotFoundException("User: " + userId + " is not found."));
+
+        SeriesModel serie = eventService.getSerieByEvent(id);
+
+        UserSeriesModel userSerie = userSerieService.getUserSerieByUserSerie(user, serie).orElseThrow(() ->
+                new ResourceNotFoundException("UserSerie is not found."));
+
+        event.setLastUpdatedDate();
+        event.setEventDate(eventDate);
+        eventService.saveOrUpdate(event);
+
+        return new ResponseEntity("Event with id: " + id + " is modified", HttpStatus.OK);
     }
 
-    @DeleteMapping("/event/{id}")
-    private ResponseEntity deleteById(@PathVariable("id") Integer id) {
+    @DeleteMapping("/event/{id}/user_id={user_id}")
+    private ResponseEntity deleteById(@PathVariable("id") Integer id,
+                                      @PathVariable("user_id") Integer userId) {
         try {
             EventModel event = eventService.getEventById(id).orElseThrow(() ->
                     new ResourceNotFoundException("Event: " + id + " is not found."));
+
+            UserModel user = userService.getUserById(userId).orElseThrow(() ->
+                    new ResourceNotFoundException("User: " + userId + " is not found."));
+
+            SeriesModel serie = eventService.getSerieByEvent(id);
+
+            UserSeriesModel userSerie = userSerieService.getUserSerieByUserSerie(user, serie).orElseThrow(() ->
+                    new ResourceNotFoundException("UserSerie is not found."));
+
             eventService.delete(event);
         } catch (IllegalArgumentException exception) {
             return ResponseEntity.badRequest().build();
