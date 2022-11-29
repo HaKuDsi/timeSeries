@@ -28,7 +28,7 @@ public class UserController {
     }
 
     @PostMapping("/user")
-    private ResponseEntity createUser(@RequestParam String userName) {
+    public ResponseEntity createUser(@RequestParam String userName) {
         try {
             UserModel user = new UserModel(userName);
             userService.saveOrUpdate(user);
@@ -39,21 +39,21 @@ public class UserController {
     }
 
     @PutMapping("/user/{id}")
-    private ResponseEntity updateUser(@PathVariable("id") Integer id,
+    public ResponseEntity updateUser(@PathVariable("id") Integer id,
                                       @RequestParam String userName) {
         try {
             UserModel user = userService.getUserById(id).orElseThrow(() ->
                     new ResourceNotFoundException("User: " + id + " not found."));
             user.setName(userName);
             userService.saveOrUpdate(user);
-            return new ResponseEntity("New user created with id: " + user.getId(), HttpStatus.CREATED);
+            return new ResponseEntity("User modified with id: " + user.getId(), HttpStatus.CREATED);
         } catch (IllegalArgumentException exception) {
             return ResponseEntity.badRequest().build();
         }
     }
 
     @DeleteMapping("/user/{id}")
-    private ResponseEntity deleteById(@PathVariable("id") int id) {
+    public ResponseEntity deleteById(@PathVariable("id") int id) {
         try {
             userService.delete(id);
             return new ResponseEntity("User delete with id: " + id, HttpStatus.OK);
