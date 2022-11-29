@@ -22,7 +22,7 @@ public class UserController {
     }
 
     @GetMapping("/user/{id}")
-    private UserModel getUserById(@PathVariable("id") int id) {
+    public UserModel getUserById(@PathVariable("id") int id) {
         return userService.getUserById(id).orElseThrow(() ->
                 new ResourceNotFoundException("User: " + id + "is not found."));
     }
@@ -46,7 +46,7 @@ public class UserController {
                     new ResourceNotFoundException("User: " + id + " not found."));
             user.setName(userName);
             userService.saveOrUpdate(user);
-            return new ResponseEntity("User modified with id: " + user.getId(), HttpStatus.CREATED);
+            return new ResponseEntity("User modified with id: " + user.getId(), HttpStatus.OK);
         } catch (IllegalArgumentException exception) {
             return ResponseEntity.badRequest().build();
         }
