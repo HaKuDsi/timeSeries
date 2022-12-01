@@ -4,6 +4,7 @@ import com.timeseries.seriestemporelles.exception.ResourceNotFoundException;
 import com.timeseries.seriestemporelles.model.UserModel;
 import com.timeseries.seriestemporelles.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
@@ -40,13 +41,14 @@ public class UserController {
 
     @PutMapping("/user/{id}")
     public ResponseEntity updateUser(@PathVariable("id") Integer id,
-                                      @RequestParam String userName) {
+                                     @RequestBody UserModel user) {
+        Assert.hasText(user.getName(), "User can't be empty/null/blank");
         try {
-            UserModel user = userService.getUserById(id).orElseThrow(() ->
+            UserModel userUpdate = userService.getUserById(user.getId()).orElseThrow(() ->
                     new ResourceNotFoundException("User: " + id + " not found."));
-            user.setName(userName);
-            userService.saveOrUpdate(user);
-            return new ResponseEntity("User modified with id: " + user.getId(), HttpStatus.OK);
+            userUpdate.setName(user.getName());
+            userService.saveOrUpdate(userUpdate);
+            return new ResponseEntity("User modified with id: " + userUpdate.getId(), HttpStatus.OK);
         } catch (IllegalArgumentException exception) {
             return ResponseEntity.badRequest().build();
         }

@@ -3,6 +3,7 @@ package com.timeseries.seriestemporelles.service;
 import com.timeseries.seriestemporelles.model.UserModel;
 import com.timeseries.seriestemporelles.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ public class UserService {
         userRepository.findAll().forEach(user -> users.add(user));
         return users;
     }
-
+    @Cacheable("user")
     public Optional<UserModel> getUserById(int id) {
         return userRepository.findById(id);
     }

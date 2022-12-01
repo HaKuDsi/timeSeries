@@ -111,7 +111,7 @@ public class UserControllerTest {
         mvc.perform(mockRequest)
                 .andExpect(status().isBadRequest());
     }
-
+/*
     @Test
     public void updateUserTest() throws Exception{
         given(userController.updateUser(user1.getId(), user2.getName())).willReturn(new ResponseEntity(HttpStatus.OK));
@@ -129,6 +129,8 @@ public class UserControllerTest {
         mvc.perform(mockRequest)
                 .andExpect(status().isOk());
     }
+
+ */
 
     @Test
     public void deleteByIdTest() throws Exception {
