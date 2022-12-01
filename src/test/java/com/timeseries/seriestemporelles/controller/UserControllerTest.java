@@ -2,11 +2,11 @@ package com.timeseries.seriestemporelles.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.timeseries.seriestemporelles.model.UserModel;
+import com.timeseries.seriestemporelles.repository.UserRepository;
 import com.timeseries.seriestemporelles.service.UserService;
 import org.assertj.core.groups.Tuple;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -42,13 +42,11 @@ import static org.assertj.core.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 public class UserControllerTest {
 
-    @Autowired
-    private MockMvc mvc;
 
     @Mock
-    private UserService userService;
+    UserService userService;
     @InjectMocks
-    private UserController userController;
+    UserController userController;
 
 /*
     @Test

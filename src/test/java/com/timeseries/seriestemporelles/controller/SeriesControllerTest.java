@@ -1,5 +1,5 @@
 package com.timeseries.seriestemporelles.controller;
-
+/*
 import com.timeseries.seriestemporelles.model.SeriesModel;
 import com.timeseries.seriestemporelles.model.UserPrivilage;
 import com.timeseries.seriestemporelles.model.UserSeriesModel;
@@ -80,5 +80,7 @@ public class SeriesControllerTest {
     }
 
 
- */
+
 }
+
+*/

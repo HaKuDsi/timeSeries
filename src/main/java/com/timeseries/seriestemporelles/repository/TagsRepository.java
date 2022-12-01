@@ -17,6 +17,6 @@ public interface TagsRepository extends JpaRepository <TagsModel, Integer> {
     @Query(value = "select tag from TagsModel tag where tag.event = ?1 and tag.label = ?2")
     TagsModel getTagByEventLabel(EventModel event, String label);
 
-    @Query(value = "select events from TagsModel tags where tags.label = ?1")
+    @Query(value = "select tags.event from TagsModel tags where tags.label = ?1")
     List<EventModel> findEventsByTag(String label);
 }
