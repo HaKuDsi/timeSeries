@@ -24,9 +24,9 @@ public class UserController {
     }
 
     @GetMapping("/user/{id}")
-    public UserModel getUserById(@PathVariable("id") int id) {
-        return userService.getUserById(id).orElseThrow(() ->
-                new ResourceNotFoundException("User: " + id + "is not found."));
+    public ResponseEntity<UserModel> getUserById(@PathVariable("id") int id) {
+        return ResponseEntity.ok(userService.getUserById(id).orElseThrow(() ->
+                new ResourceNotFoundException("User: " + id + " is not found.")));
     }
 
     @PostMapping("/user")
@@ -56,7 +56,7 @@ public class UserController {
     }
 
     @DeleteMapping("/user/{id}")
-    public ResponseEntity deleteById(@PathVariable("id") int id) {
+    public ResponseEntity deleteUserById(@PathVariable("id") int id) {
         try {
             userService.delete(id);
             return new ResponseEntity("User delete with id: " + id, HttpStatus.OK);

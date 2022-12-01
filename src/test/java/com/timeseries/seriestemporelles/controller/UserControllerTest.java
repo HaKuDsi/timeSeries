@@ -1,10 +1,12 @@
 package com.timeseries.seriestemporelles.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.timeseries.seriestemporelles.exception.ResourceNotFoundException;
 import com.timeseries.seriestemporelles.model.UserModel;
 import com.timeseries.seriestemporelles.repository.UserRepository;
 import com.timeseries.seriestemporelles.service.UserService;
 import org.assertj.core.groups.Tuple;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -21,16 +23,19 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.IsNull.notNullValue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -48,22 +53,10 @@ public class UserControllerTest {
     @InjectMocks
     UserController userController;
 
-/*
+    UserModel user = new UserModel(1, "hadi");
+
     @Test
-    public void getAllUsersTest() throws Exception {
-
-        //given(userController.getAllUsers()).willReturn(allUsers);
-
-        mvc.perform(get("/users")
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(3)))
-                .andExpect(jsonPath("[1].name", is(user2.getName())));
-    }
-
- */
-    @Test
-    public void mustReturnFeatureFromService() {
+    public void getAllUsersTest() {
 
         var userModel = new UserModel[]{
                 new UserModel(1, "hadi"),
@@ -88,89 +81,77 @@ public class UserControllerTest {
                 );
         verify(userService).getAllUsers();
     }
-    /*
+
     @Test
+    @DisplayName("should return user with the name hadi")
     public void getUserByIdTest() throws Exception {
-        given(userController.getUserById(user1.getId())).willReturn(user1);
+        when(userService.getUserById(user.getId())).thenReturn(Optional.of(user));
 
-        mvc.perform(get("/user/1")
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", notNullValue()))
-                .andExpect(jsonPath("name", is(user1.getName())));
+        var response = userController.getUserById(user.getId());
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody()).isEqualTo(user);
+        verify(userService).getUserById(user.getId());
     }
 
     @Test
-    public void getUserByIdTestFail() throws Exception {
-        given(userController.getUserById(10)).willReturn(null);
+    @DisplayName("should throw exception: ResourceNotFoundException(\"User: 0 is not found.\")")
+    public void getUserByIdTest_fails() throws Exception {
+        ResourceNotFoundException exeption = assertThrows(ResourceNotFoundException.class,
+                () -> userController.getUserById(anyInt()));
 
-        mvc.perform(get("/user/10")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+        assertTrue(exeption.getMessage().contains("User: 0 is not found."));
+        verify(userService).getUserById(anyInt());
     }
 
     @Test
+    @DisplayName("should create a new user with the name hadi")
     public void createUserTest() throws Exception {
+        doNothing().when(userService).saveOrUpdate(user);
 
-        given(userController.createUser(user1)).willReturn(new ResponseEntity(HttpStatus.CREATED));
+        var response = userController.createUser(user);
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        String json = objectMapper.writeValueAsString(user1);
-
-        MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders
-                .post("/user")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(json);
-
-        mvc.perform(mockRequest)
-                .andExpect(status().isCreated());
-    }
-
-    @Test
-    public void createUserWithoutNameTest() throws Exception {
-        UserModel userEmpty = new UserModel(4,"");
-        given(userController.createUser(user1)).willReturn(new ResponseEntity(HttpStatus.CREATED));
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        String json = objectMapper.writeValueAsString(userEmpty);
-
-        MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders
-                .post("/user")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(json);
-
-        mvc.perform(mockRequest)
-                .andExpect(status().isOk());
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(response.getBody()).isNotNull();
+        verify(userService).saveOrUpdate(user);
     }
 
     @Test
     public void updateUserTest() throws Exception{
-        given(userController.updateUser(user1.getId(), user2)).willReturn(new ResponseEntity(HttpStatus.OK));
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        String json = objectMapper.writeValueAsString(user1);
+        doNothing().when(userService).saveOrUpdate(user);
+        when(userService.getUserById(user.getId())).thenReturn(Optional.of(user));
 
-        MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders
-                .put("/user/1")
-                .param("userName", user2.getName())
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(json);
+        var response = userController.updateUser(user.getId(), user);
 
-        mvc.perform(mockRequest)
-                .andExpect(status().isOk());
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody()).isEqualTo("User modified with id: 1");
+        verify(userService).saveOrUpdate(user);
     }
 
     @Test
-    public void deleteByIdTest() throws Exception {
-        given(userController.deleteById(user1.getId())).willReturn(new ResponseEntity(HttpStatus.OK));
+    public void updateUserTest_fails() throws Exception {
+        ResourceNotFoundException exeption = assertThrows(ResourceNotFoundException.class,
+                () -> userController.updateUser(anyInt(), user));
 
-        mvc.perform(delete("/user/1")
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+        assertTrue(exeption.getMessage().contains("User: 0 not found."));
+        verify(userService).getUserById(1);
     }
 
-     */
+    @Test
+    public void deleteUserByIdTest() {
+        doNothing().when(userService).delete(1);
+
+        var response = userController.deleteUserById(1);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        verify(userService).delete(1);
+    }
 }
