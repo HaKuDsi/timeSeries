@@ -26,10 +26,10 @@ public class SeriesController {
     UserService userService;
 
     @GetMapping("/series")
-    private List getAllSeries() { return seriesService.getAllSeries(); }
+    public List getAllSeries() { return seriesService.getAllSeries(); }
 
     @GetMapping("/serie/{id}/user_id={user_id}")
-    private SeriesModel getSerieById(@PathVariable("id") Integer id,
+    public SeriesModel getSerieById(@PathVariable("id") Integer id,
                                      @PathVariable("user_id") Integer userId) {
         UserModel user = userService.getUserById(userId).orElseThrow(() ->
                 new ResourceNotFoundException("User: " + userId + "not found."));
@@ -47,7 +47,7 @@ public class SeriesController {
     }
 
     @PostMapping("/serie/{id}")
-    private ResponseEntity createSerie(@PathVariable("id") Integer id,
+    public ResponseEntity createSerie(@PathVariable("id") Integer id,
                                        @RequestBody SeriesModel series) {
         try {
             series.setLastUpdatedDate();
@@ -70,7 +70,7 @@ public class SeriesController {
     }
 
     @PutMapping("/serie/{id}/user_id={user_id}")
-    private ResponseEntity updateSerie(@PathVariable("id") Integer id,
+    public ResponseEntity updateSerie(@PathVariable("id") Integer id,
                                        @PathVariable("user_id") Integer userId,
                                        @RequestBody SeriesModel series) {
         try {
@@ -95,7 +95,7 @@ public class SeriesController {
     }
 
     @DeleteMapping("/serie/{id}/user_id={user_id}")
-    private ResponseEntity deleteById(@PathVariable("id") Integer id,
+    public ResponseEntity deleteById(@PathVariable("id") Integer id,
                                       @PathVariable("user_id") Integer userId) {
         try {
             UserModel user = userService.getUserById(userId).orElseThrow(() ->

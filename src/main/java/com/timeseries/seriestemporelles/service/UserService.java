@@ -16,10 +16,8 @@ public class UserService {
     @Autowired
     UserRepository userRepository;
 
-    public List getAllUsers() {
-        List users = new ArrayList();
-        userRepository.findAll().forEach(user -> users.add(user));
-        return users;
+    public List<UserModel> getAllUsers() {
+        return userRepository.findAll();
     }
     @Cacheable("user")
     public Optional<UserModel> getUserById(int id) {

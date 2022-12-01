@@ -2,10 +2,17 @@ package com.timeseries.seriestemporelles.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.timeseries.seriestemporelles.model.UserModel;
+import com.timeseries.seriestemporelles.service.UserService;
+import org.assertj.core.groups.Tuple;
 import org.junit.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -22,31 +29,32 @@ import java.util.List;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 
-@RunWith(SpringRunner.class)
-@WebMvcTest(UserController.class)
+@ExtendWith(MockitoExtension.class)
 public class UserControllerTest {
 
     @Autowired
     private MockMvc mvc;
 
-    @MockBean
+    @Mock
+    private UserService userService;
+    @InjectMocks
     private UserController userController;
 
-    UserModel user1 = new UserModel(1, "hadi");
-    UserModel user2 = new UserModel(2, "oumar");
-    UserModel user3 = new UserModel(3, "saliou");
-    List<UserModel> allUsers = new ArrayList<>(Arrays.asList(user1, user2, user3));
-
+/*
     @Test
     public void getAllUsersTest() throws Exception {
 
-        given(userController.getAllUsers()).willReturn(allUsers);
+        //given(userController.getAllUsers()).willReturn(allUsers);
 
         mvc.perform(get("/users")
                 .contentType(MediaType.APPLICATION_JSON))
@@ -55,6 +63,34 @@ public class UserControllerTest {
                 .andExpect(jsonPath("[1].name", is(user2.getName())));
     }
 
+ */
+    @Test
+    public void mustReturnFeatureFromService() {
+
+        var userModel = new UserModel[]{
+                new UserModel(1, "hadi"),
+                new UserModel(2, "oumar"),
+                new UserModel(3, "saliou")
+        };
+
+
+        when(userService.getAllUsers()).thenReturn(Arrays.asList(userModel));
+
+        var response = userController.getAllUsers();
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody())
+                .extracting(f -> Tuple.tuple(f.getId(), f.getName()))
+                .containsExactly(
+                        Tuple.tuple(1,"hadi"),
+                        Tuple.tuple(2, "oumar"),
+                        Tuple.tuple(3, "saliou")
+                );
+        verify(userService).getAllUsers();
+    }
+    /*
     @Test
     public void getUserByIdTest() throws Exception {
         given(userController.getUserById(user1.getId())).willReturn(user1);
@@ -137,4 +173,6 @@ public class UserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
+
+     */
 }
