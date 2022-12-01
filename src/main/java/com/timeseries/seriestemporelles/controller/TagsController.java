@@ -65,6 +65,12 @@ public class TagsController {
         return null;
     }
 
+    @GetMapping("/tags")
+    private List getEventsOfTag(@RequestParam String label) {
+
+        return tagsService.getEventsOfTag(label);
+    }
+
     @PostMapping("/tags/event_id={event_id}/user_id={user_id}")
     private ResponseEntity createTagToEvent(@PathVariable("event_id") Integer eventId,
                                             @PathVariable("user_id") Integer userId,

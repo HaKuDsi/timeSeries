@@ -78,14 +78,13 @@ public class UserControllerTest {
     @Test
     public void createUserTest() throws Exception {
 
-        given(userController.createUser(user1.getName())).willReturn(new ResponseEntity(HttpStatus.CREATED));
+        given(userController.createUser(user1)).willReturn(new ResponseEntity(HttpStatus.CREATED));
 
         ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(user1);
 
         MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders
                 .post("/user")
-                .param("userName", user1.getName())
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(json);
@@ -95,12 +94,12 @@ public class UserControllerTest {
     }
 
     @Test
-    public void createUserWithoutParamTest() throws Exception {
-
-        given(userController.createUser(user1.getName())).willReturn(new ResponseEntity(HttpStatus.CREATED));
+    public void createUserWithoutNameTest() throws Exception {
+        UserModel userEmpty = new UserModel(4,"");
+        given(userController.createUser(user1)).willReturn(new ResponseEntity(HttpStatus.CREATED));
 
         ObjectMapper objectMapper = new ObjectMapper();
-        String json = objectMapper.writeValueAsString(user1);
+        String json = objectMapper.writeValueAsString(userEmpty);
 
         MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders
                 .post("/user")
@@ -109,12 +108,12 @@ public class UserControllerTest {
                 .content(json);
 
         mvc.perform(mockRequest)
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isOk());
     }
-/*
+
     @Test
     public void updateUserTest() throws Exception{
-        given(userController.updateUser(user1.getId(), user2.getName())).willReturn(new ResponseEntity(HttpStatus.OK));
+        given(userController.updateUser(user1.getId(), user2)).willReturn(new ResponseEntity(HttpStatus.OK));
 
         ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(user1);
@@ -129,8 +128,6 @@ public class UserControllerTest {
         mvc.perform(mockRequest)
                 .andExpect(status().isOk());
     }
-
- */
 
     @Test
     public void deleteByIdTest() throws Exception {

@@ -29,9 +29,9 @@ public class UserController {
     }
 
     @PostMapping("/user")
-    public ResponseEntity createUser(@RequestParam String userName) {
+    public ResponseEntity createUser(@RequestBody UserModel user) {
+        Assert.hasText(user.getName(), "User can't be empty/null/blank");
         try {
-            UserModel user = new UserModel(userName);
             userService.saveOrUpdate(user);
             return new ResponseEntity("New user created with id: " + user.getId(), HttpStatus.CREATED);
         } catch (IllegalArgumentException exception) {

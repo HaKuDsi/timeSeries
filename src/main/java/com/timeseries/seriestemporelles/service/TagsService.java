@@ -48,4 +48,8 @@ public class TagsService {
     public TagsModel getTagByEventLabel(EventModel event, String label) {
         return tagsRepository.getTagByEventLabel(event, label);
     }
+
+    public List getEventsOfTag(String label) {
+        return tagsRepository.findEventsByTag(label);
+    }
 }
