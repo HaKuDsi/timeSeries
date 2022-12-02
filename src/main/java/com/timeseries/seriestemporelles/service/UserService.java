@@ -25,7 +25,7 @@ public class UserService {
     }
 
     public void saveOrUpdate(UserModel user) {
-        Assert.notNull(user,"cannot save a null object");
+        Assert.notNull(user.getName(),"cannot save a null object");
         userRepository.save(user);
     }
 

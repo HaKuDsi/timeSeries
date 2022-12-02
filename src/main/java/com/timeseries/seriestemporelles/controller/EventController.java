@@ -9,6 +9,7 @@ import com.timeseries.seriestemporelles.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,6 +35,8 @@ public class EventController {
     @GetMapping("/event/{id}/user_id={user_id}")
     public ResponseEntity<EventModel> getEventById(@PathVariable("id") Integer id,
                                     @PathVariable("user_id") Integer userId) {
+        Assert.notNull(id, "cannot fetch null id");
+        Assert.notNull(userId, "cannot fetch null id");
         UserModel user = userService.getUserById(userId).orElseThrow(() ->
                 new ResourceNotFoundException("User: " + userId + " is not found."));
 
