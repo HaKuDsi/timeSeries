@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 public class UserControllerTest {
-/*
+
     @Mock
     UserService userService;
     @InjectMocks
@@ -59,7 +59,7 @@ public class UserControllerTest {
 
     @Test
     @DisplayName("should return user with the name hadi")
-    public void getUserByIdTest() throws Exception {
+    public void getUserByIdTest() {
         when(userService.getUserById(user.getId())).thenReturn(Optional.of(user));
 
         var response = userController.getUserById(user.getId());
@@ -73,7 +73,7 @@ public class UserControllerTest {
 
     @Test
     @DisplayName("should throw exception: ResourceNotFoundException(\"User: 0 is not found.\")")
-    public void getUserByIdTest_fails() throws Exception {
+    public void getUserByIdTest_fails() {
         ResourceNotFoundException exeption = assertThrows(ResourceNotFoundException.class,
                 () -> userController.getUserById(anyInt()));
 
@@ -83,7 +83,7 @@ public class UserControllerTest {
 
     @Test
     @DisplayName("should create a new user with the name hadi")
-    public void createUserTest() throws Exception {
+    public void createUserTest() {
         doNothing().when(userService).saveOrUpdate(user);
 
         var response = userController.createUser(user);
@@ -96,10 +96,8 @@ public class UserControllerTest {
 
     @Test
     public void createUserTest_fail() {
-
         var user = userController.createUser(null);
         assertThat(user.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-
     }
 
     @Test
@@ -108,7 +106,7 @@ public class UserControllerTest {
         doNothing().when(userService).saveOrUpdate(user);
         when(userService.getUserById(user.getId())).thenReturn(Optional.of(user));
 
-        var response = userController.updateUser(user.getId(), user);
+        var response = userController.updateUser(user.getId(), user.getName());
 
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -118,12 +116,18 @@ public class UserControllerTest {
     }
 
     @Test
-    public void updateUserTest_fails() throws Exception {
+    public void updateUserTest_noUser() {
         ResourceNotFoundException exeption = assertThrows(ResourceNotFoundException.class,
-                () -> userController.updateUser(anyInt(), user));
+                () -> userController.updateUser(anyInt(), user.getName()));
 
         assertTrue(exeption.getMessage().contains("User: 0 not found."));
-        verify(userService).getUserById(1);
+        verify(userService).getUserById(anyInt());
+    }
+
+    @Test
+    public void updateUserTest_nullUser() {
+        var response = userController.updateUser(user.getId(), null);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
     @Test
@@ -135,8 +139,12 @@ public class UserControllerTest {
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
-        verify(userService).delete(1);
+        verify(userService).delete(user.getId());
     }
 
- */
+    @Test
+    public void deleteUserById_fail() {
+        var response = userController.deleteUserById(null);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
 }

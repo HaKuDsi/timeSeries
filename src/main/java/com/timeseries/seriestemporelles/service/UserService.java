@@ -31,6 +31,7 @@ public class UserService {
     }
 
     public void delete(int id) {
+        Assert.notNull(id, "cannot fetch with null id");
         userRepository.deleteById(id);
     }
 }

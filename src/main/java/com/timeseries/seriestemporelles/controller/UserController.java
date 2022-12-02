@@ -42,8 +42,8 @@ public class UserController {
     @PutMapping("/user/{id}")
     public ResponseEntity updateUser(@PathVariable("id") Integer id,
                                      @RequestParam String user) {
-        //Assert.hasText(user.getName(), "User can't be empty/null/blank");
         try {
+            Assert.notNull(user, "User cannot be null");
             UserModel userUpdate = userService.getUserById(id).orElseThrow(() ->
                     new ResourceNotFoundException("User: " + id + " not found."));
             userUpdate.setName(user);
@@ -55,8 +55,9 @@ public class UserController {
     }
 
     @DeleteMapping("/user/{id}")
-    public ResponseEntity deleteUserById(@PathVariable("id") int id) {
+    public ResponseEntity deleteUserById(@PathVariable("id") Integer id) {
         try {
+            Assert.notNull(id, "cannot fetch with null id");
             userService.delete(id);
             return new ResponseEntity("User delete with id: " + id, HttpStatus.OK);
         } catch (IllegalArgumentException exception) {
