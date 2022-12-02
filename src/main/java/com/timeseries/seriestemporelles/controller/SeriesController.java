@@ -11,13 +11,14 @@ import com.timeseries.seriestemporelles.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 public class SeriesController {
-/*
+
     @Autowired
     SeriesService seriesService;
     @Autowired
@@ -48,8 +49,11 @@ public class SeriesController {
 
     @PostMapping("/serie/{id}")
     public ResponseEntity createSerie(@PathVariable("id") Integer id,
-                                       @RequestBody SeriesModel series) {
+                                      @RequestBody SeriesModel series) {
         try {
+            Assert.notNull(id, "cannot fetch null id");
+            Assert.notNull(series, "series cannot be null");
+
             series.setLastUpdatedDate();
             seriesService.saveOrUpdate(series);
 
@@ -63,10 +67,10 @@ public class SeriesController {
             userSeries.setUserPrivilege(UserPrivilage.WRITE_PRIVILAGE);
             userSerieService.saveOrUpdate(userSeries);
 
+            return new ResponseEntity("New series created with id: " + series.getId(), HttpStatus.CREATED);
         } catch (IllegalArgumentException exception) {
             return ResponseEntity.badRequest().build();
         }
-        return new ResponseEntity("New series created with id: " + series.getId(), HttpStatus.CREATED);
     }
 
     @PutMapping("/serie/{id}/user_id={user_id}")
@@ -75,12 +79,14 @@ public class SeriesController {
                                        @RequestParam String title,
                                       @RequestParam String description) {
         try {
+            Assert.notNull(title, "title cannot be null");
+            Assert.notNull(description, "description cannot be null");
+
             UserModel user = userService.getUserById(userId).orElseThrow(() ->
-                    new ResourceNotFoundException("User: " + userId + "not found."));
+                    new ResourceNotFoundException("User: " + userId + " not found."));
 
             SeriesModel serie = seriesService.getSerieById(id).orElseThrow(() ->
-                    new ResourceNotFoundException("Serie: " + id + " is not found."));
-
+                    new ResourceNotFoundException("Serie: " + id + " not found."));
 
             UserSeriesModel userSerie = userSerieService.getUserSerieByUserSerie(user, serie).orElseThrow(() ->
                     new ResourceNotFoundException("UserSerie is not found."));
@@ -93,18 +99,21 @@ public class SeriesController {
             } else {
                 return new ResponseEntity("User doesn't have permission", HttpStatus.BAD_REQUEST);
             }
+            return new ResponseEntity("New series created with id: " + serie.getId(), HttpStatus.CREATED);
         } catch (IllegalArgumentException exception) {
             return ResponseEntity.badRequest().build();
         }
-        return new ResponseEntity("New series created with id: " + series.getId(), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/serie/{id}/user_id={user_id}")
-    public ResponseEntity deleteById(@PathVariable("id") Integer id,
+    public ResponseEntity deleteSerieById(@PathVariable("id") Integer id,
                                       @PathVariable("user_id") Integer userId) {
         try {
+            Assert.notNull(id, "cannot fetch with null id");
+            Assert.notNull(userId, "cannot fetch with null id");
+
             UserModel user = userService.getUserById(userId).orElseThrow(() ->
-                    new ResourceNotFoundException("User: " + userId + "not found."));
+                    new ResourceNotFoundException("User: " + userId + " not found."));
 
             SeriesModel serie = seriesService.getSerieById(id).orElseThrow(() ->
                     new ResourceNotFoundException("Serie: " + id + " not found."));
@@ -123,6 +132,4 @@ public class SeriesController {
         }
         return new ResponseEntity("Serie delete with id: " + id, HttpStatus.OK);
     }
-
- */
 }

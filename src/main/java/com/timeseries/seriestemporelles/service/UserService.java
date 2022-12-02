@@ -7,7 +7,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,7 +20,7 @@ public class UserService {
         return userRepository.findAll();
     }
     @Cacheable("user")
-    public Optional<UserModel> getUserById(int id) {
+    public Optional<UserModel> getUserById(Integer id) {
         return userRepository.findById(id);
     }
 

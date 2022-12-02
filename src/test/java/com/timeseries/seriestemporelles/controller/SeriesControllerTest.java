@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 public class SeriesControllerTest {
-/*
+
     @Mock
     SeriesService seriesService;
 
@@ -155,6 +155,12 @@ public class SeriesControllerTest {
     }
 
     @Test
+    public void createSerieTest_fail() {
+        var response = seriesController.createSerie(null, null);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
     public void updateSerieTest() {
         UserSeriesModel userSeries = new UserSeriesModel(5, user, serie, UserPrivilage.WRITE_PRIVILAGE, true);
 
@@ -162,12 +168,44 @@ public class SeriesControllerTest {
         when(seriesService.getSerieById(serie.getId())).thenReturn(Optional.ofNullable(serie));
         when(userSerieService.getUserSerieByUserSerie(user, serie)).thenReturn(Optional.of(userSeries));
 
-        var response = seriesController.updateSerie(serie.getId(), user.getId(), serie);
+        var response = seriesController.updateSerie(serie.getId(),
+                user.getId(),
+                serie.getTitle(),
+                serie.getDescription());
 
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(response.getBody()).isNotNull();
         verify(seriesService).saveOrUpdate(serie);
+    }
+
+    @Test
+    public void updateSerieTest_noUser() {
+        ResourceNotFoundException exeption = assertThrows(ResourceNotFoundException.class,
+                () -> seriesController.updateSerie(serie.getId(), anyInt(), serie.getTitle(), serie.getDescription()));
+
+        assertTrue(exeption.getMessage().contains("User: 0 not found."));
+    }
+
+    @Test
+    public void updateSerieTest_noUserSerie() {
+        when(userService.getUserById(user.getId())).thenReturn(Optional.of(user));
+        when(seriesService.getSerieById(serie.getId())).thenReturn(Optional.ofNullable(serie));
+
+        ResourceNotFoundException exeption = assertThrows(ResourceNotFoundException.class,
+                () -> seriesController.updateSerie(serie.getId(), user.getId(), serie.getTitle(), serie.getDescription()));
+
+        assertTrue(exeption.getMessage().contains("UserSerie is not found."));
+    }
+
+    @Test
+    public void updateSerieTest_noSerie() {
+        when(userService.getUserById(user.getId())).thenReturn(Optional.of(user));
+        ResourceNotFoundException exeption = assertThrows(ResourceNotFoundException.class,
+                () -> seriesController.updateSerie(anyInt(), user.getId(), serie.getTitle(), serie.getDescription()));
+
+        assertTrue(exeption.getMessage().contains("Serie: 0 not found."));
+        verify(userService).getUserById(anyInt());
     }
 
     @Test
@@ -178,11 +216,20 @@ public class SeriesControllerTest {
         when(seriesService.getSerieById(serie.getId())).thenReturn(Optional.ofNullable(serie));
         when(userSerieService.getUserSerieByUserSerie(user, serie)).thenReturn(Optional.of(userSeries));
 
-        var response = seriesController.updateSerie(serie.getId(), user.getId(), serie);
+        var response = seriesController.updateSerie(serie.getId(),
+                user.getId(),
+                serie.getTitle(),
+                serie.getDescription());
 
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isNotNull();
+    }
+
+    @Test
+    public void updateSerieTest_fail() {
+        var response = seriesController.updateSerie(serie.getId(), user.getId(), null, null);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
     @Test
@@ -194,12 +241,36 @@ public class SeriesControllerTest {
         when(seriesService.getSerieById(serie.getId())).thenReturn(Optional.ofNullable(serie));
         when(userSerieService.getUserSerieByUserSerie(user, serie)).thenReturn(Optional.of(userSeries));
 
-        var response = seriesController.deleteById(serie.getId(), user.getId());
+        var response = seriesController.deleteSerieById(serie.getId(), user.getId());
 
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
         verify(seriesService).delete(serie.getId());
+    }
+
+    @Test
+    public void deleteSerieTest_noUser() {
+        var response = seriesController.deleteSerieById(serie.getId(), anyInt());
+
+        assertEquals(response.getStatusCode(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Test
+    public void deleteSerieTest_noSerie() {
+        when(userService.getUserById(user.getId())).thenReturn(Optional.of(user));
+
+        var response = seriesController.deleteSerieById(anyInt(), user.getId());
+
+        assertEquals(response.getStatusCode(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    @Test
+    public void deleteSerieTest_noUserSerie() {
+        when(userService.getUserById(user.getId())).thenReturn(Optional.of(user));
+        when(seriesService.getSerieById(serie.getId())).thenReturn(Optional.ofNullable(serie));
+        var response = seriesController.deleteSerieById(serie.getId(), user.getId());
+
+        assertEquals(response.getStatusCode(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Test
@@ -210,13 +281,11 @@ public class SeriesControllerTest {
         when(seriesService.getSerieById(serie.getId())).thenReturn(Optional.ofNullable(serie));
         when(userSerieService.getUserSerieByUserSerie(user, serie)).thenReturn(Optional.of(userSeries));
 
-        var response = seriesController.deleteById(serie.getId(), user.getId());
+        var response = seriesController.deleteSerieById(serie.getId(), user.getId());
 
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isNotNull();
     }
-
- */
 }
 
