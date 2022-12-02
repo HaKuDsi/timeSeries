@@ -20,16 +20,14 @@ public class EventService {
     @Autowired
     SeriesRepository seriesRepository;
 
-    public List getAllEvents() {
-        List events = new ArrayList();
-        eventRepository.findAll().forEach(event -> events.add(event));
-        return events;
+    public List<EventModel> getAllEvents() {
+        return eventRepository.findAll();
     }
 
-    public List getEventsOfSerie(int id) {
+    public List<EventModel> getEventsOfSerie(int id) {
         List events = new ArrayList();
         SeriesModel serie = seriesRepository.findById(id).get();
-        return (List) eventRepository.findBySerie(serie);
+        return eventRepository.findBySerie(serie);
     }
 
     public Optional<EventModel> getEventById(int id) {

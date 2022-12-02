@@ -14,7 +14,7 @@ public class WebConfig {
         FilterRegistrationBean<ShallowEtagHeaderFilter> filterFilterRegistrationBean =
                 new FilterRegistrationBean(new ShallowEtagHeaderFilter());
 
-        filterFilterRegistrationBean.addUrlPatterns("/series", "/serie/*", "/events", "/event/*");
+        filterFilterRegistrationBean.addUrlPatterns("/series", "/serie/*", "/events", "/event/*", "/tags/*");
         filterFilterRegistrationBean.setName("eTag");
 
         return filterFilterRegistrationBean;

@@ -29,10 +29,10 @@ public class EventController {
     UserSerieService userSerieService;
 
     @GetMapping("/events")
-    private List getAllEvents() { return eventService.getAllEvents();}
+    public ResponseEntity<List<EventModel>> getAllEvents() { return ResponseEntity.ok(eventService.getAllEvents());}
 
     @GetMapping("/event/{id}/user_id={user_id}")
-    private EventModel getEventById(@PathVariable("id") Integer id,
+    public ResponseEntity<EventModel> getEventById(@PathVariable("id") Integer id,
                                     @PathVariable("user_id") Integer userId) {
         UserModel user = userService.getUserById(userId).orElseThrow(() ->
                 new ResourceNotFoundException("User: " + userId + " is not found."));
@@ -42,12 +42,14 @@ public class EventController {
         UserSeriesModel userSerie = userSerieService.getUserSerieByUserSerie(user, serie).orElseThrow(() ->
                 new ResourceNotFoundException("UserSerie is not found."));
 
-        return eventService.getEventById(id).orElseThrow(() ->
+        EventModel eventModel = eventService.getEventById(id).orElseThrow(() ->
                 new ResourceNotFoundException("Event: " + id + " is not found."));
+
+        return ResponseEntity.ok(eventModel);
     }
 
     @GetMapping("/event/user_id={user_id}/serie_id={serie_id}")
-    private List getEventsOfSerie(@PathVariable("user_id") Integer userId,
+    public ResponseEntity<List<EventModel>> getEventsOfSerie(@PathVariable("user_id") Integer userId,
                                   @PathVariable("serie_id") Integer serieId) {
         UserModel user = userService.getUserById(userId).orElseThrow(() ->
                 new ResourceNotFoundException("User: " + userId + " is not found."));
@@ -58,11 +60,11 @@ public class EventController {
         UserSeriesModel userSerie = userSerieService.getUserSerieByUserSerie(user, serie).orElseThrow(() ->
                 new ResourceNotFoundException("UserSerie is not found."));
 
-        return eventService.getEventsOfSerie(serieId);
+        return ResponseEntity.ok(eventService.getEventsOfSerie(serieId));
     }
 
     @PostMapping("/event/user_id={user_id}/serie_id={serie_id}")
-    private ResponseEntity createEntity(@PathVariable("user_id") Integer userId,
+    public ResponseEntity createEntity(@PathVariable("user_id") Integer userId,
                                         @PathVariable("serie_id") Integer serieId ,
                                         @RequestBody EventModel event,
                                         @RequestParam String eventDate) {
@@ -92,7 +94,7 @@ public class EventController {
     }
 
     @PutMapping("/event/{id}/user_id={user_id}")
-    private ResponseEntity updateEntity(@PathVariable("id") Integer id,
+    public ResponseEntity updateEvent(@PathVariable("id") Integer id,
                                         @PathVariable("user_id") Integer userId,
                                         @RequestParam String eventDate) {
 
@@ -122,7 +124,7 @@ public class EventController {
     }
 
     @DeleteMapping("/event/{id}/user_id={user_id}")
-    private ResponseEntity deleteById(@PathVariable("id") Integer id,
+    public ResponseEntity deleteEventById(@PathVariable("id") Integer id,
                                       @PathVariable("user_id") Integer userId) {
         try {
             EventModel event = eventService.getEventById(id).orElseThrow(() ->

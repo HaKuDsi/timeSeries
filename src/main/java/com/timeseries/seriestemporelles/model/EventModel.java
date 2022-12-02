@@ -31,6 +31,19 @@ public class EventModel {
     public EventModel() {
     }
 
+    public EventModel(Integer id,
+                      ZonedDateTime eventDate,
+                      Integer eventValue,
+                      String comment,
+                      SeriesModel serie) {
+        this.id = id;
+        this.eventDate = eventDate;
+        this.eventValue = eventValue;
+        this.comment = comment;
+        this.serie = serie;
+        setLastUpdatedDate();
+    }
+
     public Integer getId() {
         return id;
     }
