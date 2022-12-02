@@ -15,8 +15,10 @@ public class SeriesService {
     @Autowired
     SeriesRepository seriesRepository;
 
-    public List<SeriesModel> getAllSeries() {
-        return seriesRepository.findAll();
+    public List getAllSeries() {
+        List series = new ArrayList();
+        seriesRepository.findAll().forEach(serie -> series.add(serie));
+        return series;
     }
 
     public Optional<SeriesModel> getSerieById(int id) { return seriesRepository.findById(id); }
