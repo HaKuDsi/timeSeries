@@ -17,7 +17,7 @@ import java.util.List;
 
 @RestController
 public class SeriesController {
-
+/*
     @Autowired
     SeriesService seriesService;
     @Autowired
@@ -72,7 +72,8 @@ public class SeriesController {
     @PutMapping("/serie/{id}/user_id={user_id}")
     public ResponseEntity updateSerie(@PathVariable("id") Integer id,
                                        @PathVariable("user_id") Integer userId,
-                                       @RequestBody SeriesModel series) {
+                                       @RequestParam String title,
+                                      @RequestParam String description) {
         try {
             UserModel user = userService.getUserById(userId).orElseThrow(() ->
                     new ResourceNotFoundException("User: " + userId + "not found."));
@@ -80,11 +81,15 @@ public class SeriesController {
             SeriesModel serie = seriesService.getSerieById(id).orElseThrow(() ->
                     new ResourceNotFoundException("Serie: " + id + " is not found."));
 
+
             UserSeriesModel userSerie = userSerieService.getUserSerieByUserSerie(user, serie).orElseThrow(() ->
                     new ResourceNotFoundException("UserSerie is not found."));
 
             if(userSerie.getOwner()) {
-                seriesService.saveOrUpdate(series);
+                serie.setDescription(description);
+                serie.setTitle(title);
+                serie.setLastUpdatedDate();
+                seriesService.saveOrUpdate(serie);
             } else {
                 return new ResponseEntity("User doesn't have permission", HttpStatus.BAD_REQUEST);
             }
@@ -118,4 +123,6 @@ public class SeriesController {
         }
         return new ResponseEntity("Serie delete with id: " + id, HttpStatus.OK);
     }
+
+ */
 }

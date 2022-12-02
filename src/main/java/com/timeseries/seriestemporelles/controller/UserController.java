@@ -41,12 +41,12 @@ public class UserController {
 
     @PutMapping("/user/{id}")
     public ResponseEntity updateUser(@PathVariable("id") Integer id,
-                                     @RequestBody UserModel user) {
-        Assert.hasText(user.getName(), "User can't be empty/null/blank");
+                                     @RequestParam String user) {
+        //Assert.hasText(user.getName(), "User can't be empty/null/blank");
         try {
-            UserModel userUpdate = userService.getUserById(user.getId()).orElseThrow(() ->
+            UserModel userUpdate = userService.getUserById(id).orElseThrow(() ->
                     new ResourceNotFoundException("User: " + id + " not found."));
-            userUpdate.setName(user.getName());
+            userUpdate.setName(user);
             userService.saveOrUpdate(userUpdate);
             return new ResponseEntity("User modified with id: " + userUpdate.getId(), HttpStatus.OK);
         } catch (IllegalArgumentException exception) {
