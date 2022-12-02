@@ -95,7 +95,15 @@ public class UserControllerTest {
     }
 
     @Test
-    public void updateUserTest() throws Exception{
+    public void createUserTest_fail() {
+
+        var user = userController.createUser(null);
+        assertThat(user.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+
+    }
+
+    @Test
+    public void updateUserTest() {
 
         doNothing().when(userService).saveOrUpdate(user);
         when(userService.getUserById(user.getId())).thenReturn(Optional.of(user));

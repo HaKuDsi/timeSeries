@@ -5,6 +5,7 @@ import com.timeseries.seriestemporelles.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +26,7 @@ public class UserService {
     }
 
     public void saveOrUpdate(UserModel user) {
+        Assert.notNull(user,"cannot save a null object");
         userRepository.save(user);
     }
 

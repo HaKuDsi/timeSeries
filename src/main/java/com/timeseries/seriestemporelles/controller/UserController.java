@@ -30,8 +30,8 @@ public class UserController {
 
     @PostMapping("/user")
     public ResponseEntity createUser(@RequestBody UserModel user) {
-        Assert.hasText(user.getName(), "User can't be empty/null/blank");
         try {
+            Assert.notNull(user, "User can't be empty/null/blank");
             userService.saveOrUpdate(user);
             return new ResponseEntity("New user created with id: " + user.getId(), HttpStatus.CREATED);
         } catch (IllegalArgumentException exception) {
