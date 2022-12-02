@@ -22,8 +22,7 @@ import static org.assertj.core.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 public class UserControllerTest {
-
-
+    
     @Mock
     UserService userService;
     @InjectMocks
