@@ -117,7 +117,7 @@ public class SeriesControllerTest {
     }
 
     @Test
-    public void getSerieByIdTest_noPrivilage() throws Exception {
+    public void getSerieByIdTest_noPrivilage() {
         UserSeriesModel userSeries = new UserSeriesModel(5, user, serie, UserPrivilage.READ_PRIVILAGE, true);
 
         when(seriesService.getSerieById(serie.getId())).thenReturn(Optional.ofNullable(serie));

@@ -44,6 +44,7 @@ public class UserController {
                                      @RequestParam String user) {
         try {
             Assert.notNull(user, "User cannot be null");
+            Assert.hasText(user);
             UserModel userUpdate = userService.getUserById(id).orElseThrow(() ->
                     new ResourceNotFoundException("User: " + id + " not found."));
             userUpdate.setName(user);

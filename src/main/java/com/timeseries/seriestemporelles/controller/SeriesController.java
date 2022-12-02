@@ -53,6 +53,8 @@ public class SeriesController {
         try {
             Assert.notNull(id, "cannot fetch null id");
             Assert.notNull(series, "series cannot be null");
+            Assert.hasText(series.getDescription(), "Must have a description");
+            Assert.hasText(series.getTitle(), "Must have a title");
 
             series.setLastUpdatedDate();
             seriesService.saveOrUpdate(series);
@@ -79,8 +81,8 @@ public class SeriesController {
                                        @RequestParam String title,
                                       @RequestParam String description) {
         try {
-            Assert.notNull(title, "title cannot be null");
-            Assert.notNull(description, "description cannot be null");
+            Assert.hasText(title, "title cannot be null");
+            Assert.hasText(description, "description cannot be null");
 
             UserModel user = userService.getUserById(userId).orElseThrow(() ->
                     new ResourceNotFoundException("User: " + userId + " not found."));
