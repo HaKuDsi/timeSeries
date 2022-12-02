@@ -23,7 +23,7 @@ public class UserSerieService {
         return userSeries;
     }
 
-    public UserSeriesModel getUserSerieById(int id) { return userSerieRepository.findById(id).get(); }
+    public Optional<UserSeriesModel> getUserSerieById(int id) { return userSerieRepository.findById(id); }
 
     public void saveOrUpdate(UserSeriesModel userSeries) { userSerieRepository.save(userSeries); }
 
