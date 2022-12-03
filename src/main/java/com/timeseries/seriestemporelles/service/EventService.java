@@ -38,8 +38,8 @@ public class EventService {
         eventRepository.save(event);
     }
 
-    public void delete(EventModel event) {
-        eventRepository.delete(event);
+    public void deleteById(Integer id) {
+        eventRepository.deleteById(id);
     }
 
     public SeriesModel getSerieByEvent(Integer id) {

@@ -134,6 +134,7 @@ public class EventController {
     public ResponseEntity deleteEventById(@PathVariable("id") Integer id,
                                       @PathVariable("user_id") Integer userId) {
         try {
+            Assert.notNull(id, "id cannot be null");
             EventModel event = eventService.getEventById(id).orElseThrow(() ->
                     new ResourceNotFoundException("Event: " + id + " is not found."));
 
@@ -146,7 +147,7 @@ public class EventController {
                     new ResourceNotFoundException("UserSerie is not found."));
             
             if(userSerie.getUserPrivilege() == UserPrivilage.WRITE_PRIVILAGE) {
-                eventService.delete(event);
+                eventService.deleteById(event.getId());
             } else {
                 return new ResponseEntity("User doesn't have permission", HttpStatus.BAD_REQUEST);
             }

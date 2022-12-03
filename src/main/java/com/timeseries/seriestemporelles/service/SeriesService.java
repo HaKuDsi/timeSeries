@@ -5,6 +5,7 @@ import com.timeseries.seriestemporelles.repository.SeriesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -23,5 +24,5 @@ public class SeriesService {
 
     public void saveOrUpdate(SeriesModel serie) { seriesRepository.save(serie); }
 
-    public void delete(int id) { seriesRepository.deleteById(id); }
+    public void delete(Integer id) { seriesRepository.deleteById(id); }
 }

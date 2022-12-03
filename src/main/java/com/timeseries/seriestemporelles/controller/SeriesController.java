@@ -1,10 +1,8 @@
 package com.timeseries.seriestemporelles.controller;
 
 import com.timeseries.seriestemporelles.exception.ResourceNotFoundException;
-import com.timeseries.seriestemporelles.model.SeriesModel;
-import com.timeseries.seriestemporelles.model.UserModel;
-import com.timeseries.seriestemporelles.model.UserPrivilage;
-import com.timeseries.seriestemporelles.model.UserSeriesModel;
+import com.timeseries.seriestemporelles.model.*;
+import com.timeseries.seriestemporelles.service.EventService;
 import com.timeseries.seriestemporelles.service.SeriesService;
 import com.timeseries.seriestemporelles.service.UserSerieService;
 import com.timeseries.seriestemporelles.service.UserService;
@@ -15,6 +13,7 @@ import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class SeriesController {
@@ -25,6 +24,9 @@ public class SeriesController {
     UserSerieService userSerieService;
     @Autowired
     UserService userService;
+
+    @Autowired
+    EventService eventService;
 
     @GetMapping("/series")
     public ResponseEntity<List<SeriesModel>> getAllSeries() { return ResponseEntity.ok(seriesService.getAllSeries()); }

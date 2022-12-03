@@ -49,6 +49,8 @@ public class EventControllerTest {
 
     EventModel event = new EventModel(1, zonedDateTime, 10, "yeah", serie);
     EventModel event2 = new EventModel(2, zonedDateTime, 10, "yeah", serie);
+    UserModel user = new UserModel(4, "hadi");
+
 
     @Test
     public void getAllEventsTest() {
@@ -76,7 +78,6 @@ public class EventControllerTest {
 
     @Test
     public void getEventByIdTest() {
-        UserModel user = new UserModel(4, "hadi");
         UserSeriesModel userSeries = new UserSeriesModel(5, user, serie, UserPrivilage.WRITE_PRIVILAGE, true);
 
         when(eventService.getSerieByEvent(event.getId())).thenReturn(serie);
@@ -95,14 +96,13 @@ public class EventControllerTest {
 
     @Test
     public void getEventByIdTest_noUser() {
-        ResourceNotFoundException exeption = assertThrows(ResourceNotFoundException.class,
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
                 () -> eventController.getEventById(event.getId(), anyInt()));
-        assertTrue(exeption.getMessage().contains("User: 0 is not found."));
+        assertTrue(exception.getMessage().contains("User: 0 is not found."));
     }
     
     @Test
     public void getEventByIdTest_noUserSerie() {
-        UserModel user = new UserModel(4, "hadi");
         when(userService.getUserById(user.getId())).thenReturn(Optional.of(user));
         when(eventService.getSerieByEvent(event.getId())).thenReturn(serie);
         ResourceNotFoundException exeption = assertThrows(ResourceNotFoundException.class,
@@ -114,7 +114,6 @@ public class EventControllerTest {
     @Test
     public void getEventByIdTest_noEvent() {
 
-        UserModel user = new UserModel(4, "hadi");
         UserSeriesModel userSeries = new UserSeriesModel(5, user, serie, UserPrivilage.WRITE_PRIVILAGE, true);
 
         when(userService.getUserById(user.getId())).thenReturn(Optional.of(user));
@@ -129,14 +128,7 @@ public class EventControllerTest {
     }
 
     @Test
-    public void getEventByIdTest_fail() {
-       // var response = eventController.getEventById(null, null);
-        //assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-    }
-
-    @Test
     public void getEventsOfSerieTest() {
-        UserModel user = new UserModel(4, "hadi");
         UserSeriesModel userSeries = new UserSeriesModel(5, user, serie, UserPrivilage.WRITE_PRIVILAGE, true);
         var events = new EventModel[]{
                 event,
@@ -170,7 +162,6 @@ public class EventControllerTest {
 
     @Test
     public void getEventOfSerieTest_noSerie() {
-        UserModel user = new UserModel(4, "hadi");
         when(userService.getUserById(user.getId())).thenReturn(Optional.of(user));
         ResourceNotFoundException exeption = assertThrows(ResourceNotFoundException.class,
                 () -> eventController.getEventsOfSerie(user.getId(), anyInt()));
@@ -179,7 +170,6 @@ public class EventControllerTest {
 
     @Test
     public void getEventOfSerieTest_noUserSerie() {
-        UserModel user = new UserModel(4, "hadi");
         when(userService.getUserById(user.getId())).thenReturn(Optional.of(user));
         when(seriesService.getSerieById(serie.getId())).thenReturn(Optional.of(serie));
         ResourceNotFoundException exeption = assertThrows(ResourceNotFoundException.class,
@@ -189,7 +179,6 @@ public class EventControllerTest {
 
     @Test
     public void createEntityTest() {
-        UserModel user = new UserModel(4, "hadi");
         UserSeriesModel userSeries = new UserSeriesModel(5, user, serie, UserPrivilage.WRITE_PRIVILAGE, true);
 
         when(seriesService.getSerieById(serie.getId())).thenReturn(Optional.of(serie));
@@ -208,11 +197,35 @@ public class EventControllerTest {
         verify(eventService).saveOrUpdate(event);
     }
 
+    @Test
+    public void createEntityTest_NoUser() {
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+                () -> eventController.createEntity(anyInt(), serie.getId(), event, "2011-12-03T10:15:30"));
+        assertTrue(exception.getMessage().contains("User: 0 is not found."));
 
+    }
+
+    @Test
+    public void createEntityTest_NoSerie() {
+        when(userService.getUserById(user.getId())).thenReturn(Optional.of(user));
+
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+                () -> eventController.createEntity(user.getId(), anyInt(), event, "2011-12-03T10:15:30"));
+        assertTrue(exception.getMessage().contains("Serie: 0 is not found."));
+    }
+
+    @Test
+    public void createEntityTest_noUserSerie() {
+        when(userService.getUserById(user.getId())).thenReturn(Optional.of(user));
+        when(seriesService.getSerieById(serie.getId())).thenReturn(Optional.ofNullable(serie));
+
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+                () -> eventController.createEntity(user.getId(), serie.getId(), event, "2011-12-03T10:15:30"));
+        assertTrue(exception.getMessage().contains("UserSerie is not found."));
+    }
 
     @Test
     public void createEventTest_noPrivilage() {
-        UserModel user = new UserModel(4, "hadi");
         UserSeriesModel userSeries = new UserSeriesModel(5, user, serie, UserPrivilage.READ_PRIVILAGE, true);
 
         when(seriesService.getSerieById(serie.getId())).thenReturn(Optional.of(serie));
@@ -230,8 +243,13 @@ public class EventControllerTest {
     }
 
     @Test
+    public void creatEventTest_fail() {
+        var response = eventController.createEntity(null, null, null,null);
+        assertEquals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
     public void updateEventTest() {
-        UserModel user = new UserModel(4, "hadi");
         UserSeriesModel userSeries = new UserSeriesModel(5, user, serie, UserPrivilage.WRITE_PRIVILAGE, true);
 
         when(eventService.getEventById(event.getId())).thenReturn(Optional.ofNullable(event));
@@ -250,8 +268,32 @@ public class EventControllerTest {
     }
 
     @Test
+    public void updateEventTest_noUser() {
+        when(eventService.getEventById(event.getId())).thenReturn(Optional.ofNullable(event));
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+                () -> eventController.updateEvent(event.getId(), anyInt(), "2011-12-03T10:15:30"));
+        assertEquals(exception.getMessage(), "User: 0 is not found.");
+    }
+
+    @Test
+    public void updateEventTest_noUserSerie() {
+        when(eventService.getEventById(event.getId())).thenReturn(Optional.ofNullable(event));
+        when(userService.getUserById(user.getId())).thenReturn(Optional.of(user));
+
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+                () -> eventController.updateEvent(event.getId(), user.getId(), "2011-12-03T10:15:30"));
+        assertEquals(exception.getMessage(), "UserSerie is not found.");
+    }
+
+    @Test
+    public void updateEventTest_noEvent() {
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+                () -> eventController.updateEvent(anyInt(), user.getId(), "2011-12-03T10:15:30"));
+        assertEquals(exception.getMessage(), "Event: 0 is not found.");
+    }
+
+    @Test
     public void updateEventTest_noPrivilage() {
-        UserModel user = new UserModel(4, "hadi");
         UserSeriesModel userSeries = new UserSeriesModel(5, user, serie, UserPrivilage.READ_PRIVILAGE, true);
 
         when(eventService.getEventById(event.getId())).thenReturn(Optional.ofNullable(event));
@@ -268,26 +310,60 @@ public class EventControllerTest {
     }
 
     @Test
+    public void updateEventTest_fail() {
+        var response = eventController.updateEvent(event.getId(),
+                1,
+                "");
+        assertEquals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
     public void deleteEventById() {
-        UserModel user = new UserModel(4, "hadi");
         UserSeriesModel userSeries = new UserSeriesModel(5, user, serie, UserPrivilage.WRITE_PRIVILAGE, true);
 
         when(eventService.getEventById(event.getId())).thenReturn(Optional.ofNullable(event));
         when(userService.getUserById(user.getId())).thenReturn(Optional.of(user));
         when(eventService.getSerieByEvent(event.getId())).thenReturn(serie);
         when(userSerieService.getUserSerieByUserSerie(user, serie)).thenReturn(Optional.of(userSeries));
-        doNothing().when(eventService).delete(event);
+        doNothing().when(eventService).deleteById(event.getId());
 
         var response = eventController.deleteEventById(event.getId(), user.getId());
 
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
-        verify(eventService).delete(event);
+        assertThat(response.getBody().toString().contains("Event delete with id: " + event.getId()));
+        verify(eventService).deleteById(event.getId());
     }
+
     @Test
-    public void deleteEventById_noPrivilage() {
+    public void deleteEventByIdTest_noUser() {
+        when(eventService.getEventById(event.getId())).thenReturn(Optional.ofNullable(event));
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+                () -> eventController.deleteEventById(event.getId(), anyInt()));
+        assertEquals(exception.getMessage(), "User: 0 is not found.");
+    }
+
+    @Test
+    public void deleteEventByIdTest_noUserSerie() {
         UserModel user = new UserModel(4, "hadi");
+        when(eventService.getEventById(event.getId())).thenReturn(Optional.ofNullable(event));
+        when(userService.getUserById(user.getId())).thenReturn(Optional.of(user));
+        when(eventService.getSerieByEvent(event.getId())).thenReturn(serie);
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+                () -> eventController.deleteEventById(event.getId(), user.getId()));
+        assertEquals(exception.getMessage(), "UserSerie is not found.");
+    }
+
+    @Test
+    public void deleteEventByIdTest_noEvent() {
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+                () -> eventController.deleteEventById(anyInt(), 1));
+        assertEquals(exception.getMessage(), "Event: 0 is not found.");
+    }
+
+    @Test
+    public void deleteEventByIdTest_noPrivilage() {
         UserSeriesModel userSeries = new UserSeriesModel(5, user, serie, UserPrivilage.READ_PRIVILAGE, true);
 
         when(eventService.getEventById(event.getId())).thenReturn(Optional.ofNullable(event));
@@ -300,6 +376,12 @@ public class EventControllerTest {
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isNotNull();
+    }
+
+    @Test
+    public void deleteEventByIdTest_fail() {
+        var response = eventController.deleteEventById(null, 1);
+        assertEquals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
     }
 
 }

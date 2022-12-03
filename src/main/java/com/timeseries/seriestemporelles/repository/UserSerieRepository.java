@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -15,4 +16,8 @@ public interface UserSerieRepository extends JpaRepository <UserSeriesModel, Int
             "where u_s.users = ?1 and " +
             "u_s.series = ?2")
     Optional<UserSeriesModel> userSerieExist(UserModel user, SeriesModel serie);
+
+    @Query(value = "select userSerie from UserSeriesModel userSerie " +
+            "where userSerie.series = ?1")
+    List<UserSeriesModel> allUserSeriesFromSerie(SeriesModel series);
 }

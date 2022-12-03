@@ -9,7 +9,6 @@ class SeriesTemporellesApplicationTests {
 
     @Test
     void contextLoads() {
-        UserControllerTest userControllerTest ;
     }
 
 }

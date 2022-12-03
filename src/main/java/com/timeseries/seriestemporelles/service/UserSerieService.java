@@ -18,10 +18,8 @@ public class UserSerieService {
     @Autowired
     UserSerieRepository userSerieRepository;
 
-    public List getAllUserSeries() {
-        List userSeries = new ArrayList();
-        userSerieRepository.findAll().forEach(userSerie -> userSeries.add(userSerie));
-        return userSeries;
+    public List<UserSeriesModel> getAllUserSeries() {
+        return userSerieRepository.findAll();
     }
     @Cacheable("userSerie")
     public Optional<UserSeriesModel> getUserSerieById(int id) { return userSerieRepository.findById(id); }
@@ -33,5 +31,9 @@ public class UserSerieService {
     @Cacheable("userSerie")
     public Optional<UserSeriesModel> getUserSerieByUserSerie(UserModel user, SeriesModel serie) {
         return userSerieRepository.userSerieExist(user, serie);
+    }
+
+    public List<UserSeriesModel> getAllUserSeriesBySerie(SeriesModel serie) {
+        return userSerieRepository.allUserSeriesFromSerie(serie);
     }
 }

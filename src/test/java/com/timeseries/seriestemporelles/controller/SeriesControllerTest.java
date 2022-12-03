@@ -43,9 +43,9 @@ public class SeriesControllerTest {
     UserModel user = new UserModel(3, "hadi");
 
     @Test
-    public void getAllSeriesTest() throws Exception {
+    public void getAllSeriesTest() {
         var series = new SeriesModel[]{
-                new SeriesModel(1, "runnung", "i like to run"),
+                serie,
                 new SeriesModel(2, "swimming", "i like to swim")
         };
 
@@ -66,8 +66,7 @@ public class SeriesControllerTest {
     }
 
     @Test
-    public void getSerieByIdTest() throws Exception {
-        UserModel user = new UserModel(3, "hadi");
+    public void getSerieByIdTest() {
         UserSeriesModel userSeries = new UserSeriesModel(5, user, serie, UserPrivilage.WRITE_PRIVILAGE, true);
 
         when(seriesService.getSerieById(serie.getId())).thenReturn(Optional.ofNullable(serie));
@@ -94,7 +93,6 @@ public class SeriesControllerTest {
 
     @Test
     public void getSerieByIdTest_noSerie() {
-        UserModel user = new UserModel(3, "hadi");
         when(userService.getUserById(user.getId())).thenReturn(Optional.of(user));
 
         ResourceNotFoundException exeption = assertThrows(ResourceNotFoundException.class,
@@ -105,7 +103,6 @@ public class SeriesControllerTest {
     }
     @Test
     public void getSerieByIdTest_noUserSerie() {
-        UserModel user = new UserModel(3, "hadi");
         when(userService.getUserById(user.getId())).thenReturn(Optional.of(user));
         when(seriesService.getSerieById(serie.getId())).thenReturn(Optional.ofNullable(serie));
 
@@ -286,6 +283,12 @@ public class SeriesControllerTest {
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isNotNull();
+    }
+
+    @Test
+    public void deleteSerieTest_fail() {
+        var response = seriesController.deleteSerieById(null, null);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
 
