@@ -31,7 +31,7 @@ public class TagsController {
     TagsService tagsService;
 
     @GetMapping("/tags/event_id={event_id}/user_id={user_id}")
-    private List getTagsOfEvent(@PathVariable("event_id") Integer eventId,
+    public ResponseEntity<List<TagsModel>> getTagsOfEvent(@PathVariable("event_id") Integer eventId,
                                 @PathVariable("user_id") Integer userId) {
         UserModel user = userService.getUserById(userId).orElseThrow(() ->
                 new ResourceNotFoundException("User: " + userId + " is not found."));
@@ -44,32 +44,35 @@ public class TagsController {
         UserSeriesModel userSerie = userSerieService.getUserSerieByUserSerie(user, serie).orElseThrow(() ->
                 new ResourceNotFoundException("UserSerie is not found."));
 
-        return tagsService.getTagsOfEvent(event);
+        return ResponseEntity.ok(tagsService.getTagsOfEvent(event));
     }
 
     @GetMapping("/tags/serie_id={serie_id}/user_id={user_id}")
-    private List getTagsOfSerie(@PathVariable("serie_id") Integer serieId,
+    public ResponseEntity<List<TagsModel>> getTagsOfSerie(@PathVariable("serie_id") Integer serieId,
                                 @PathVariable("user_id") Integer userId) {
         UserModel user = userService.getUserById(userId).orElseThrow(() ->
                 new ResourceNotFoundException("User: " + userId + " is not found."));
 
         SeriesModel serie = seriesService.getSerieById(serieId).orElseThrow(() ->
-                new ResourceNotFoundException("Serie: " + serieId + "not found."));
+                new ResourceNotFoundException("Serie: " + serieId + " not found."));
 
         UserSeriesModel userSerie = userSerieService.getUserSerieByUserSerie(user, serie).orElseThrow(() ->
                 new ResourceNotFoundException("UserSerie is not found."));
 
-        if(userSerie.getOwner()) {
-            return tagsService.getTagsOfSerie(serie);
-        }
-        return null;
+        return ResponseEntity.ok(tagsService.getTagsOfSerie(serie));
+    }
+
+    @GetMapping("/tags")
+    public ResponseEntity<List<EventModel>> getEventsOfTag(@RequestParam String label) {
+        return ResponseEntity.ok(tagsService.getEventsOfTag(label));
     }
 
     @PostMapping("/tags/event_id={event_id}/user_id={user_id}")
-    private ResponseEntity createTagToEvent(@PathVariable("event_id") Integer eventId,
+    public ResponseEntity createTagToEvent(@PathVariable("event_id") Integer eventId,
                                             @PathVariable("user_id") Integer userId,
                                             @RequestParam String label) {
         try {
+            Assert.hasText(label, "Label cannot be empty/null");
             UserModel user = userService.getUserById(userId).orElseThrow(() ->
                     new ResourceNotFoundException("User: " + userId + " is not found."));
 
@@ -97,10 +100,11 @@ public class TagsController {
     }
 
     @DeleteMapping("/tags/event_id={event_id}/user_id={user_id}")
-    private ResponseEntity deleteTag(@PathVariable("event_id") Integer eventId,
+    public ResponseEntity deleteTag(@PathVariable("event_id") Integer eventId,
                                             @PathVariable("user_id") Integer userId,
                                             @RequestParam String label) {
         try {
+            Assert.hasText(label, "Label cannot be empty/null");
             UserModel user = userService.getUserById(userId).orElseThrow(() ->
                     new ResourceNotFoundException("User: " + userId + " is not found."));
 

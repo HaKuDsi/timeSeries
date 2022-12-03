@@ -27,6 +27,13 @@ public class SeriesModel {
     public SeriesModel() {
     }
 
+    public SeriesModel(Integer id, String title, String description) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        setLastUpdatedDate();
+    }
+
     public Integer getId() {
         return id;
     }

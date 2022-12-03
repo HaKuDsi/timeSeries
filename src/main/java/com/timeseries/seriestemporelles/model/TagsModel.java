@@ -26,6 +26,13 @@ public class TagsModel {
     public TagsModel() {
     }
 
+    public TagsModel(Integer id, String label, EventModel event) {
+        this.id = id;
+        this.label = label;
+        this.event = event;
+        this.setLastUpdatedDate();
+    }
+
     public Integer getId() {
         return id;
     }

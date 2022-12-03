@@ -1,19 +1,19 @@
 package com.timeseries.seriestemporelles.controller;
 
 import com.timeseries.seriestemporelles.exception.ResourceNotFoundException;
-import com.timeseries.seriestemporelles.model.SeriesModel;
-import com.timeseries.seriestemporelles.model.UserModel;
-import com.timeseries.seriestemporelles.model.UserPrivilage;
-import com.timeseries.seriestemporelles.model.UserSeriesModel;
+import com.timeseries.seriestemporelles.model.*;
+import com.timeseries.seriestemporelles.service.EventService;
 import com.timeseries.seriestemporelles.service.SeriesService;
 import com.timeseries.seriestemporelles.service.UserSerieService;
 import com.timeseries.seriestemporelles.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class SeriesController {
@@ -25,36 +25,44 @@ public class SeriesController {
     @Autowired
     UserService userService;
 
+    @Autowired
+    EventService eventService;
+
     @GetMapping("/series")
-    private List getAllSeries() { return seriesService.getAllSeries(); }
+    public ResponseEntity<List<SeriesModel>> getAllSeries() { return ResponseEntity.ok(seriesService.getAllSeries()); }
 
     @GetMapping("/serie/{id}/user_id={user_id}")
-    private SeriesModel getSerieById(@PathVariable("id") Integer id,
+    public ResponseEntity<SeriesModel> getSerieById(@PathVariable("id") Integer id,
                                      @PathVariable("user_id") Integer userId) {
         UserModel user = userService.getUserById(userId).orElseThrow(() ->
-                new ResourceNotFoundException("User: " + userId + "not found."));
+                new ResourceNotFoundException("User: " + userId + " not found."));
 
         SeriesModel serie = seriesService.getSerieById(id).orElseThrow(() ->
-                new ResourceNotFoundException("Serie: " + id + " is not found."));
+                new ResourceNotFoundException("Serie: " + id + " not found."));
 
         UserSeriesModel userSerie = userSerieService.getUserSerieByUserSerie(user, serie).orElseThrow(() ->
-                new ResourceNotFoundException("UserSerie is not found."));
+                new ResourceNotFoundException("User: " + userId + " cannot see serie: " + id + "."));
 
         if(userSerie.getUserPrivilege() == UserPrivilage.WRITE_PRIVILAGE) {
-            return serie;
+            return ResponseEntity.ok(serie);
         }
-        return null;
+        return ResponseEntity.badRequest().build();
     }
 
     @PostMapping("/serie/{id}")
-    private ResponseEntity createSerie(@PathVariable("id") Integer id,
-                                       @RequestBody SeriesModel series) {
+    public ResponseEntity createSerie(@PathVariable("id") Integer id,
+                                      @RequestBody SeriesModel series) {
         try {
+            Assert.notNull(id, "cannot fetch null id");
+            Assert.notNull(series, "series cannot be null");
+            Assert.hasText(series.getDescription(), "Must have a description");
+            Assert.hasText(series.getTitle(), "Must have a title");
+
             series.setLastUpdatedDate();
             seriesService.saveOrUpdate(series);
 
             UserModel user = userService.getUserById(id).orElseThrow(() ->
-                    new ResourceNotFoundException("User: " + id + " is not found."));
+                    new ResourceNotFoundException("User: " + id + " not found."));
 
             UserSeriesModel userSeries = new UserSeriesModel();
             userSeries.setUsers(user);
@@ -63,46 +71,56 @@ public class SeriesController {
             userSeries.setUserPrivilege(UserPrivilage.WRITE_PRIVILAGE);
             userSerieService.saveOrUpdate(userSeries);
 
+            return new ResponseEntity("New series created with id: " + series.getId(), HttpStatus.CREATED);
         } catch (IllegalArgumentException exception) {
             return ResponseEntity.badRequest().build();
         }
-        return new ResponseEntity("New series created with id: " + series.getId(), HttpStatus.CREATED);
     }
 
     @PutMapping("/serie/{id}/user_id={user_id}")
-    private ResponseEntity updateSerie(@PathVariable("id") Integer id,
+    public ResponseEntity updateSerie(@PathVariable("id") Integer id,
                                        @PathVariable("user_id") Integer userId,
-                                       @RequestBody SeriesModel series) {
+                                       @RequestParam String title,
+                                      @RequestParam String description) {
         try {
+            Assert.hasText(title, "title cannot be null");
+            Assert.hasText(description, "description cannot be null");
+
             UserModel user = userService.getUserById(userId).orElseThrow(() ->
-                    new ResourceNotFoundException("User: " + userId + "not found."));
+                    new ResourceNotFoundException("User: " + userId + " not found."));
 
             SeriesModel serie = seriesService.getSerieById(id).orElseThrow(() ->
-                    new ResourceNotFoundException("Serie: " + id + " is not found."));
+                    new ResourceNotFoundException("Serie: " + id + " not found."));
 
             UserSeriesModel userSerie = userSerieService.getUserSerieByUserSerie(user, serie).orElseThrow(() ->
                     new ResourceNotFoundException("UserSerie is not found."));
 
             if(userSerie.getOwner()) {
-                seriesService.saveOrUpdate(series);
+                serie.setDescription(description);
+                serie.setTitle(title);
+                serie.setLastUpdatedDate();
+                seriesService.saveOrUpdate(serie);
             } else {
                 return new ResponseEntity("User doesn't have permission", HttpStatus.BAD_REQUEST);
             }
+            return new ResponseEntity("New series created with id: " + serie.getId(), HttpStatus.CREATED);
         } catch (IllegalArgumentException exception) {
             return ResponseEntity.badRequest().build();
         }
-        return new ResponseEntity("New series created with id: " + series.getId(), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/serie/{id}/user_id={user_id}")
-    private ResponseEntity deleteById(@PathVariable("id") Integer id,
+    public ResponseEntity deleteSerieById(@PathVariable("id") Integer id,
                                       @PathVariable("user_id") Integer userId) {
         try {
+            Assert.notNull(id, "cannot fetch with null id");
+            Assert.notNull(userId, "cannot fetch with null id");
+
             UserModel user = userService.getUserById(userId).orElseThrow(() ->
-                    new ResourceNotFoundException("User: " + userId + "not found."));
+                    new ResourceNotFoundException("User: " + userId + " not found."));
 
             SeriesModel serie = seriesService.getSerieById(id).orElseThrow(() ->
-                    new ResourceNotFoundException("Serie: " + id + " is not found."));
+                    new ResourceNotFoundException("Serie: " + id + " not found."));
 
             UserSeriesModel userSerie = userSerieService.getUserSerieByUserSerie(user, serie).orElseThrow(() ->
                     new ResourceNotFoundException("UserSerie is not found."));
@@ -114,7 +132,7 @@ public class SeriesController {
                 return new ResponseEntity("User doesn't have permission", HttpStatus.BAD_REQUEST);
             }
         } catch (Exception exception) {
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity(exception, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return new ResponseEntity("Serie delete with id: " + id, HttpStatus.OK);
     }

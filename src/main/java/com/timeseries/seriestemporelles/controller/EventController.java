@@ -9,6 +9,7 @@ import com.timeseries.seriestemporelles.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,11 +30,13 @@ public class EventController {
     UserSerieService userSerieService;
 
     @GetMapping("/events")
-    private List getAllEvents() { return eventService.getAllEvents();}
+    public ResponseEntity<List<EventModel>> getAllEvents() { return ResponseEntity.ok(eventService.getAllEvents());}
 
     @GetMapping("/event/{id}/user_id={user_id}")
-    private EventModel getEventById(@PathVariable("id") Integer id,
+    public ResponseEntity<EventModel> getEventById(@PathVariable("id") Integer id,
                                     @PathVariable("user_id") Integer userId) {
+        Assert.notNull(id, "cannot fetch null id");
+        Assert.notNull(userId, "cannot fetch null id");
         UserModel user = userService.getUserById(userId).orElseThrow(() ->
                 new ResourceNotFoundException("User: " + userId + " is not found."));
 
@@ -42,12 +45,14 @@ public class EventController {
         UserSeriesModel userSerie = userSerieService.getUserSerieByUserSerie(user, serie).orElseThrow(() ->
                 new ResourceNotFoundException("UserSerie is not found."));
 
-        return eventService.getEventById(id).orElseThrow(() ->
+        EventModel eventModel = eventService.getEventById(id).orElseThrow(() ->
                 new ResourceNotFoundException("Event: " + id + " is not found."));
+
+        return ResponseEntity.ok(eventModel);
     }
 
     @GetMapping("/event/user_id={user_id}/serie_id={serie_id}")
-    private List getEventsOfSerie(@PathVariable("user_id") Integer userId,
+    public ResponseEntity<List<EventModel>> getEventsOfSerie(@PathVariable("user_id") Integer userId,
                                   @PathVariable("serie_id") Integer serieId) {
         UserModel user = userService.getUserById(userId).orElseThrow(() ->
                 new ResourceNotFoundException("User: " + userId + " is not found."));
@@ -58,15 +63,18 @@ public class EventController {
         UserSeriesModel userSerie = userSerieService.getUserSerieByUserSerie(user, serie).orElseThrow(() ->
                 new ResourceNotFoundException("UserSerie is not found."));
 
-        return eventService.getEventsOfSerie(serieId);
+        return ResponseEntity.ok(eventService.getEventsOfSerie(serieId));
     }
 
     @PostMapping("/event/user_id={user_id}/serie_id={serie_id}")
-    private ResponseEntity createEntity(@PathVariable("user_id") Integer userId,
+    public ResponseEntity createEntity(@PathVariable("user_id") Integer userId,
                                         @PathVariable("serie_id") Integer serieId ,
                                         @RequestBody EventModel event,
                                         @RequestParam String eventDate) {
         try {
+            Assert.hasText(eventDate, "must add date");
+            Assert.notNull(event.getEventValue(), "must add value");
+            Assert.notNull(event.getSerie(), "Must add series");
             UserModel user = userService.getUserById(userId).orElseThrow(() ->
                     new ResourceNotFoundException("User: " + userId + " is not found."));
 
@@ -92,11 +100,12 @@ public class EventController {
     }
 
     @PutMapping("/event/{id}/user_id={user_id}")
-    private ResponseEntity updateEntity(@PathVariable("id") Integer id,
+    public ResponseEntity updateEvent(@PathVariable("id") Integer id,
                                         @PathVariable("user_id") Integer userId,
                                         @RequestParam String eventDate) {
 
         try {
+            Assert.hasText(eventDate, "must add date");
             EventModel event = eventService.getEventById(id).orElseThrow(() ->
                     new ResourceNotFoundException("Event: " + id + " is not found."));
 
@@ -122,9 +131,10 @@ public class EventController {
     }
 
     @DeleteMapping("/event/{id}/user_id={user_id}")
-    private ResponseEntity deleteById(@PathVariable("id") Integer id,
+    public ResponseEntity deleteEventById(@PathVariable("id") Integer id,
                                       @PathVariable("user_id") Integer userId) {
         try {
+            Assert.notNull(id, "id cannot be null");
             EventModel event = eventService.getEventById(id).orElseThrow(() ->
                     new ResourceNotFoundException("Event: " + id + " is not found."));
 
@@ -137,7 +147,7 @@ public class EventController {
                     new ResourceNotFoundException("UserSerie is not found."));
             
             if(userSerie.getUserPrivilege() == UserPrivilage.WRITE_PRIVILAGE) {
-                eventService.delete(event);
+                eventService.deleteById(event.getId());
             } else {
                 return new ResponseEntity("User doesn't have permission", HttpStatus.BAD_REQUEST);
             }

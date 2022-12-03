@@ -22,10 +22,8 @@ public class TagsService {
     @Autowired
     EventRepository eventRepository;
 
-    public List getAllTags() {
-        List tags = new ArrayList();
-        tagsRepository.findAll().forEach(tag -> tags.add(tag));
-        return tags;
+    public List<TagsModel> getAllTags() {
+        return tagsRepository.findAll();
     }
 
     public List getTagsOfEvent(EventModel event) {
@@ -47,5 +45,9 @@ public class TagsService {
 
     public TagsModel getTagByEventLabel(EventModel event, String label) {
         return tagsRepository.getTagByEventLabel(event, label);
+    }
+
+    public List getEventsOfTag(String label) {
+        return tagsRepository.findEventsByTag(label);
     }
 }

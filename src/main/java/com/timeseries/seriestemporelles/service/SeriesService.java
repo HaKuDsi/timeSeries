@@ -5,6 +5,7 @@ import com.timeseries.seriestemporelles.repository.SeriesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -15,15 +16,13 @@ public class SeriesService {
     @Autowired
     SeriesRepository seriesRepository;
 
-    public List getAllSeries() {
-        List series = new ArrayList();
-        seriesRepository.findAll().forEach(serie -> series.add(serie));
-        return series;
+    public List<SeriesModel> getAllSeries() {
+        return seriesRepository.findAll();
     }
 
     public Optional<SeriesModel> getSerieById(int id) { return seriesRepository.findById(id); }
 
     public void saveOrUpdate(SeriesModel serie) { seriesRepository.save(serie); }
 
-    public void delete(int id) { seriesRepository.deleteById(id); }
+    public void delete(Integer id) { seriesRepository.deleteById(id); }
 }

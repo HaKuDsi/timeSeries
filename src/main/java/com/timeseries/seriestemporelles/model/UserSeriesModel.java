@@ -28,6 +28,14 @@ public class UserSeriesModel {
     public UserSeriesModel() {
     }
 
+    public UserSeriesModel(Integer id, UserModel users, SeriesModel series, UserPrivilage userPrivilage, Boolean owner) {
+        this.id = id;
+        this.users = users;
+        this.series = series;
+        this.userPrivilage = userPrivilage;
+        this.owner = owner;
+    }
+
     public Integer getId() {
         return id;
     }
@@ -63,6 +71,7 @@ public class UserSeriesModel {
     public void setOwner(Boolean owner) {
         this.owner = owner;
     }
+
 
     @Override
     public int hashCode() {
