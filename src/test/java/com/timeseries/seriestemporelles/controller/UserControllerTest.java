@@ -86,14 +86,14 @@ public class UserControllerTest {
     @Test
     @DisplayName("should create a new user with the name hadi")
     public void createUserTest() {
-        doNothing().when(userService).saveOrUpdate(user);
+        doNothing().when(userService).saveOrUpdateUser(user);
 
         var response = userController.createUser(user);
 
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(response.getBody()).isNotNull();
-        verify(userService).saveOrUpdate(user);
+        verify(userService).saveOrUpdateUser(user);
     }
 
     @Test
@@ -105,7 +105,7 @@ public class UserControllerTest {
     @Test
     public void updateUserTest() {
 
-        doNothing().when(userService).saveOrUpdate(user);
+        doNothing().when(userService).saveOrUpdateUser(user);
         when(userService.getUserById(user.getId())).thenReturn(Optional.of(user));
 
         var response = userController.updateUser(user.getId(), user.getName());
@@ -114,7 +114,7 @@ public class UserControllerTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody()).isEqualTo("User modified with id: 1");
-        verify(userService).saveOrUpdate(user);
+        verify(userService).saveOrUpdateUser(user);
     }
 
     @Test
@@ -134,14 +134,14 @@ public class UserControllerTest {
 
     @Test
     public void deleteUserByIdTest() {
-        doNothing().when(userService).delete(1);
+        doNothing().when(userService).deleteUser(1);
 
         var response = userController.deleteUserById(1);
 
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
-        verify(userService).delete(user.getId());
+        verify(userService).deleteUser(user.getId());
     }
 
     @Test

@@ -4,7 +4,6 @@ import com.timeseries.seriestemporelles.exception.ResourceNotFoundException;
 import com.timeseries.seriestemporelles.model.*;
 import com.timeseries.seriestemporelles.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
@@ -89,7 +88,7 @@ public class TagsController {
                 tag.setLabel(label);
                 tag.setEvent(event);
                 tag.setLastUpdatedDate();
-                tagsService.saveOrUpdate(tag);
+                tagsService.saveOrUpdateTag(tag);
             } else {
                 return new ResponseEntity("User doesn't have permission", HttpStatus.BAD_REQUEST);
             }
@@ -118,7 +117,7 @@ public class TagsController {
 
             if(userSerie.getUserPrivilege() == UserPrivilage.WRITE_PRIVILAGE) {
                 TagsModel tag = tagsService.getTagByEventLabel(event, label);
-                tagsService.delete(tag);
+                tagsService.deleteTag(tag);
             } else {
                 return new ResponseEntity("User doesn't have permission", HttpStatus.BAD_REQUEST);
             }

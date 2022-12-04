@@ -24,13 +24,13 @@ public class UserService {
         return userRepository.findById(id);
     }
 
-    public void saveOrUpdate(UserModel user) {
-        Assert.notNull(user.getName(),"cannot save a null object");
+    public void saveOrUpdateUser(UserModel user) {
+        Assert.notNull(user.getName(),"cannot save a null user");
         userRepository.save(user);
     }
 
-    public void delete(int id) {
-        Assert.notNull(id, "cannot fetch with null id");
+    public void deleteUser(Integer id) {
+        Assert.notNull(id, "cannot fetch user with null id");
         userRepository.deleteById(id);
     }
 }
