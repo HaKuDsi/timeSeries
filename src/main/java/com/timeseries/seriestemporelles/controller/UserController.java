@@ -32,7 +32,7 @@ public class UserController {
     public ResponseEntity createUser(@RequestBody UserModel user) {
         try {
             Assert.notNull(user, "User can't be empty/null/blank");
-            userService.saveOrUpdate(user);
+            userService.saveOrUpdateUser(user);
             return new ResponseEntity("New user created with id: " + user.getId(), HttpStatus.CREATED);
         } catch (IllegalArgumentException exception) {
             return ResponseEntity.badRequest().build();
@@ -48,7 +48,7 @@ public class UserController {
             UserModel userUpdate = userService.getUserById(id).orElseThrow(() ->
                     new ResourceNotFoundException("User: " + id + " not found."));
             userUpdate.setName(user);
-            userService.saveOrUpdate(userUpdate);
+            userService.saveOrUpdateUser(userUpdate);
             return new ResponseEntity("User modified with id: " + userUpdate.getId(), HttpStatus.OK);
         } catch (IllegalArgumentException exception) {
             return ResponseEntity.badRequest().build();
@@ -59,7 +59,7 @@ public class UserController {
     public ResponseEntity deleteUserById(@PathVariable("id") Integer id) {
         try {
             Assert.notNull(id, "cannot fetch with null id");
-            userService.delete(id);
+            userService.deleteUser(id);
             return new ResponseEntity("User delete with id: " + id, HttpStatus.OK);
         } catch (IllegalArgumentException exception) {
             return ResponseEntity.badRequest().build();

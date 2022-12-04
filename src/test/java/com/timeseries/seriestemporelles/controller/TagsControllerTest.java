@@ -246,7 +246,7 @@ public class TagsControllerTest {
         when(eventService.getSerieByEvent(event.getId())).thenReturn(serie);
         when(userSerieService.getUserSerieByUserSerie(user, serie)).thenReturn(Optional.of(userSeries));
         when(tagsService.getTagByEventLabel(event, tag1.getLabel())).thenReturn(tag1);
-        doNothing().when(tagsService).delete(tag1);
+        doNothing().when(tagsService).deleteTag(tag1);
 
         var response = tagsController.deleteTag(event.getId(), user.getId(), tag1.getLabel());
 
@@ -254,7 +254,7 @@ public class TagsControllerTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().toString().contains("tag deleted"));
-        verify(tagsService).delete(tag1);
+        verify(tagsService).deleteTag(tag1);
     }
     @Test
     public void deleteTagTest_noUser() {

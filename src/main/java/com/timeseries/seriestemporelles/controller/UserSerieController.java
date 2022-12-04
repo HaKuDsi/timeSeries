@@ -59,7 +59,7 @@ public class UserSerieController {
                 } else {
                     shared.setUserPrivilege(UserPrivilage.READ_PRIVILAGE);
                 }
-                userSerieService.saveOrUpdate(shared);
+                userSerieService.saveOrUpdateUserSerie(shared);
             } else {
                 return new ResponseEntity("User doesn't have permission", HttpStatus.BAD_REQUEST);
             }

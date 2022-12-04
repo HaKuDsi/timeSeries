@@ -13,7 +13,6 @@ import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 public class SeriesController {
@@ -55,11 +54,9 @@ public class SeriesController {
         try {
             Assert.notNull(id, "cannot fetch null id");
             Assert.notNull(series, "series cannot be null");
-            Assert.hasText(series.getDescription(), "Must have a description");
-            Assert.hasText(series.getTitle(), "Must have a title");
 
             series.setLastUpdatedDate();
-            seriesService.saveOrUpdate(series);
+            seriesService.saveOrUpdateSerie(series);
 
             UserModel user = userService.getUserById(id).orElseThrow(() ->
                     new ResourceNotFoundException("User: " + id + " not found."));
@@ -69,7 +66,7 @@ public class SeriesController {
             userSeries.setSeries(series);
             userSeries.setOwner(true);
             userSeries.setUserPrivilege(UserPrivilage.WRITE_PRIVILAGE);
-            userSerieService.saveOrUpdate(userSeries);
+            userSerieService.saveOrUpdateUserSerie(userSeries);
 
             return new ResponseEntity("New series created with id: " + series.getId(), HttpStatus.CREATED);
         } catch (IllegalArgumentException exception) {
@@ -99,7 +96,7 @@ public class SeriesController {
                 serie.setDescription(description);
                 serie.setTitle(title);
                 serie.setLastUpdatedDate();
-                seriesService.saveOrUpdate(serie);
+                seriesService.saveOrUpdateSerie(serie);
             } else {
                 return new ResponseEntity("User doesn't have permission", HttpStatus.BAD_REQUEST);
             }
@@ -126,8 +123,8 @@ public class SeriesController {
                     new ResourceNotFoundException("UserSerie is not found."));
 
             if(userSerie.getOwner()) {
-                seriesService.delete(id);
-                userSerieService.delete(userSerie.getId());
+                seriesService.deleteSerieById(id);
+                userSerieService.deleteUserSerie(userSerie.getId());
             } else {
                 return new ResponseEntity("User doesn't have permission", HttpStatus.BAD_REQUEST);
             }

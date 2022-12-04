@@ -131,7 +131,7 @@ public class SeriesControllerTest {
 
     @Test
     public void createSerieTest() {
-        doNothing().when(seriesService).saveOrUpdate(serie);
+        doNothing().when(seriesService).saveOrUpdateSerie(serie);
         when(userService.getUserById(user.getId())).thenReturn(Optional.of(user));
 
         var response = seriesController.createSerie(user.getId(), serie);
@@ -139,7 +139,7 @@ public class SeriesControllerTest {
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(response.getBody()).isNotNull();
-        verify(seriesService).saveOrUpdate(serie);
+        verify(seriesService).saveOrUpdateSerie(serie);
     }
 
     @Test
@@ -173,7 +173,7 @@ public class SeriesControllerTest {
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(response.getBody()).isNotNull();
-        verify(seriesService).saveOrUpdate(serie);
+        verify(seriesService).saveOrUpdateSerie(serie);
     }
 
     @Test
@@ -233,7 +233,7 @@ public class SeriesControllerTest {
     public void deleteSerieTest() {
         UserSeriesModel userSeries = new UserSeriesModel(5, user, serie, UserPrivilage.WRITE_PRIVILAGE, true);
 
-        doNothing().when(seriesService).delete(serie.getId());
+        doNothing().when(seriesService).deleteSerieById(serie.getId());
         when(userService.getUserById(user.getId())).thenReturn(Optional.of(user));
         when(seriesService.getSerieById(serie.getId())).thenReturn(Optional.ofNullable(serie));
         when(userSerieService.getUserSerieByUserSerie(user, serie)).thenReturn(Optional.of(userSeries));
@@ -243,7 +243,7 @@ public class SeriesControllerTest {
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
-        verify(seriesService).delete(serie.getId());
+        verify(seriesService).deleteSerieById(serie.getId());
     }
 
     @Test

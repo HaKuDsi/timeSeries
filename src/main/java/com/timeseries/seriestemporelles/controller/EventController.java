@@ -88,7 +88,7 @@ public class EventController {
                 event.setLastUpdatedDate();
                 event.setSerie(serie);
                 event.setEventDate(eventDate);
-                eventService.saveOrUpdate(event);
+                eventService.saveOrUpdateEvent(event);
             } else {
                 return new ResponseEntity("User doesn't have permission", HttpStatus.BAD_REQUEST);
             }
@@ -120,7 +120,7 @@ public class EventController {
             if (userSerie.getUserPrivilege() == UserPrivilage.WRITE_PRIVILAGE) {
                 event.setLastUpdatedDate();
                 event.setEventDate(eventDate);
-                eventService.saveOrUpdate(event);
+                eventService.saveOrUpdateEvent(event);
             } else {
                 return new ResponseEntity("User doesn't have permission", HttpStatus.BAD_REQUEST);
             }
@@ -147,7 +147,7 @@ public class EventController {
                     new ResourceNotFoundException("UserSerie is not found."));
             
             if(userSerie.getUserPrivilege() == UserPrivilage.WRITE_PRIVILAGE) {
-                eventService.deleteById(event.getId());
+                eventService.deleteEventById(event.getId());
             } else {
                 return new ResponseEntity("User doesn't have permission", HttpStatus.BAD_REQUEST);
             }

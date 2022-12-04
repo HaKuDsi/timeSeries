@@ -184,7 +184,7 @@ public class EventControllerTest {
         when(seriesService.getSerieById(serie.getId())).thenReturn(Optional.of(serie));
         when(userService.getUserById(user.getId())).thenReturn(Optional.of(user));
         when(userSerieService.getUserSerieByUserSerie(user, serie)).thenReturn(Optional.of(userSeries));
-        doNothing().when(eventService).saveOrUpdate(event);
+        doNothing().when(eventService).saveOrUpdateEvent(event);
 
         var response = eventController.createEntity(user.getId(),
                 serie.getId(),
@@ -194,7 +194,7 @@ public class EventControllerTest {
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(response.getBody()).isNotNull();
-        verify(eventService).saveOrUpdate(event);
+        verify(eventService).saveOrUpdateEvent(event);
     }
 
     @Test
@@ -256,7 +256,7 @@ public class EventControllerTest {
         when(userService.getUserById(user.getId())).thenReturn(Optional.of(user));
         when(eventService.getSerieByEvent(event.getId())).thenReturn(serie);
         when(userSerieService.getUserSerieByUserSerie(user, serie)).thenReturn(Optional.of(userSeries));
-        doNothing().when(eventService).saveOrUpdate(event);
+        doNothing().when(eventService).saveOrUpdateEvent(event);
 
         var response = eventController.updateEvent(event.getId(),
                 user.getId(),
@@ -264,7 +264,7 @@ public class EventControllerTest {
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
-        verify(eventService).saveOrUpdate(event);
+        verify(eventService).saveOrUpdateEvent(event);
     }
 
     @Test
@@ -325,7 +325,7 @@ public class EventControllerTest {
         when(userService.getUserById(user.getId())).thenReturn(Optional.of(user));
         when(eventService.getSerieByEvent(event.getId())).thenReturn(serie);
         when(userSerieService.getUserSerieByUserSerie(user, serie)).thenReturn(Optional.of(userSeries));
-        doNothing().when(eventService).deleteById(event.getId());
+        doNothing().when(eventService).deleteEventById(event.getId());
 
         var response = eventController.deleteEventById(event.getId(), user.getId());
 
@@ -333,7 +333,7 @@ public class EventControllerTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().toString().contains("Event delete with id: " + event.getId()));
-        verify(eventService).deleteById(event.getId());
+        verify(eventService).deleteEventById(event.getId());
     }
 
     @Test
