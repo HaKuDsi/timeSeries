@@ -39,6 +39,7 @@ public class EventService {
         Assert.notNull(event.getEventValue(), "event must have a value.");
         Assert.notNull(event.getSerie(), "event must belong to a serie");
         Assert.notNull(event.getEventDate(), "event must have a date");
+        Assert.hasText(event.getEventDate(), "must add date");
         eventRepository.save(event);
     }
 

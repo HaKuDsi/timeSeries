@@ -73,8 +73,6 @@ public class EventController {
                                         @RequestParam String eventDate) {
         try {
             Assert.hasText(eventDate, "must add date");
-            Assert.notNull(event.getEventValue(), "must add value");
-            Assert.notNull(event.getSerie(), "Must add series");
             UserModel user = userService.getUserById(userId).orElseThrow(() ->
                     new ResourceNotFoundException("User: " + userId + " is not found."));
 
