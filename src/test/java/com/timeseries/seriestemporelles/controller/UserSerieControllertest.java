@@ -123,6 +123,17 @@ public class UserSerieControllertest {
     }
 
     @Test
+    public void shareSerieTest_noUserSerie() {
+        when(userService.getUserById(user1.getId())).thenReturn(Optional.ofNullable(user1));
+        when(userService.getUserById(user2.getId())).thenReturn(Optional.ofNullable(user2));
+        when(seriesService.getSerieById(serie1.getId())).thenReturn(Optional.ofNullable(serie1));
+
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+                () -> userSerieController.shareSerie(serie1.getId(), user1.getId(), user2.getId(), true));
+        assertTrue(exception.getMessage().contains("UserSerie is not found."));
+    }
+
+    @Test
     public void shareSerieTest_noPrivilage() {
         when(userService.getUserById(user1.getId())).thenReturn(Optional.ofNullable(user1));
         when(userService.getUserById(user2.getId())).thenReturn(Optional.ofNullable(user2));

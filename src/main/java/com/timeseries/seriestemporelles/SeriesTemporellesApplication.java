@@ -17,9 +17,6 @@ public class SeriesTemporellesApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(SeriesTemporellesApplication.class, args);
-        ZoneId timeZone = ZoneId.of("UTC");
-        ZonedDateTime zonedDateTime = LocalDateTime.parse("2011-12-03T10:15:30").atZone(timeZone);
-        System.out.println(zonedDateTime);
     }
 
 }
